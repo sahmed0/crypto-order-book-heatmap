@@ -6,6 +6,8 @@
 
 A high-performance, multi-threaded financial data visualisation tool for rendering real-time order book heatmaps. This project implements a local order book engine synced with the Binance BTC/USDT spot market, providing traders with deep insights into market liquidity and volume clusters.
 
+## ⏯️ [Click to View Website](https://sajidahmed.co.uk/crypto-order-book-heatmap/)
+
 ## Table of Contents
 
 - [Key Features](#key-features)
@@ -26,6 +28,8 @@ A high-performance, multi-threaded financial data visualisation tool for renderi
 - **Sub-Pixel Smooth Rendering:** Features a custom "shift-and-draw" rendering engine on an `OffscreenCanvas` with float-based coverage blending for sub-pixel accuracy.
 - **Full Order Book Integrity:** Maintains a local order book with 5000 levels per side, featuring snapshot reconciliation and sequence gap detection to ensure 100% data accuracy relative to the exchange.
 - **Adaptive UI:** Includes interactive controls for zoom, pan, auto-centring, and volume filtering, alongside dynamic price and time axes.
+
+![Preview](public/preview.png)
 
 ---
 
