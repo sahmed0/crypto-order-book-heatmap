@@ -29,7 +29,7 @@ function App() {
           gap: '8px',
         }}>
           <span style={{ color: '#3b82f6' }}>{activeSymbol().replace('USDT', '/USDT')}</span>{' '}
-          Binance Order Book Depth Heatmap
+          Binance Order Book Heatmap
         </h1>
 
         <div style={{
@@ -38,7 +38,7 @@ function App() {
           gap: '20px',
         }}>
           <a 
-            href="https://github.com/sahmed0" 
+            href="https://github.com/sahmed0/crypto-order-book-heatmap.git" 
             target="_blank" 
             rel="noopener noreferrer"
             style={{

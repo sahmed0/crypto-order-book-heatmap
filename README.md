@@ -145,7 +145,7 @@ Transferring large amounts of data between workers can be expensive. By using a 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/heatmap.git
+   git clone https://github.com/sahmed0/crypto-order-book-heatmap.git
    cd heatmap
    ```
 
