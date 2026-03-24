@@ -3,7 +3,7 @@ import solidPlugin from 'vite-plugin-solid';
 
 export default defineConfig({
   plugins: [solidPlugin()],
-  base: '/heatmap/',
+  base: './',
   server: {
     headers: {
       // Required for SharedArrayBuffer (The "High Performance" requirement)
