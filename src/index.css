@@ -1,0 +1,35 @@
+/* Copyright (c) 2026 Sajid Ahmed. All rights reserved. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(-145deg, rgb(244, 254, 255) 35%, rgb(239, 248, 255) 100%);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+#root {
+    height: 100%;
+    width: 100%;
+}

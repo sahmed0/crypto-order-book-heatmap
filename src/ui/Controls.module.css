@@ -1,0 +1,252 @@
+/* Copyright (c) 2026 Sajid Ahmed. All rights reserved. */
+
+/* ---- Tokens ---------------------------------------------------------------- */
+:root {
+    --panel-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9));
+    --panel-border-top: rgba(255, 255, 255, 0.8);
+    --panel-border-bottom: rgba(255, 255, 255, 0.3);
+    --panel-border-edge: rgba(59, 130, 246, 0.15);
+    --panel-glow: rgba(59, 130, 246, 0.1);
+    --accent: #3b82f6;
+    --accent-dim: rgba(59, 130, 246, 0.5);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --danger: #ef4444;
+    --track-bg: rgba(59, 130, 246, 0.08);
+    --radius: 20px;
+    --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ---- Panel ----------------------------------------------------------------- */
+.panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 22px;
+    background: var(--panel-bg);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.7);
+    border-left: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: var(--radius);
+    backdrop-filter: blur(32px) saturate(2.5);
+    -webkit-backdrop-filter: blur(32px) saturate(2.5);
+    font-family: var(--font);
+    color: var(--text-primary);
+    z-index: 20;
+    user-select: none;
+}
+
+.panelTitle {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--panel-border-edge);
+    margin-bottom: 4px;
+    opacity: 0.8;
+}
+
+/* ---- Control row ---------------------------------------------------------- */
+.controlRow {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.controlLabel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+}
+
+.controlValue {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    background: rgba(59, 130, 246, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ---- Slider --------------------------------------------------------------- */
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--track-bg);
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid var(--accent);
+    box-shadow: 
+        0 2px 6px rgba(59, 130, 246, 0.2),
+        inset 0 0 0 3px var(--accent);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 
+        0 4px 12px rgba(59, 130, 246, 0.3),
+        inset 0 0 0 2px var(--accent);
+}
+
+/* ---- Select --------------------------------------------------------------- */
+.select {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--text-primary);
+    border: 1px solid var(--panel-border-edge);
+    border-radius: 10px;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%233b82f6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: all 0.2s;
+}
+
+.select:hover,
+.select:focus {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+}
+
+/* ---- Divider -------------------------------------------------------------- */
+.divider {
+    height: 1px;
+    background: var(--panel-border-edge);
+    margin: -4px 0;
+    opacity: 0.6;
+}
+
+/* ---- Hint text ------------------------------------------------------------ */
+.hint {
+    font-size: 10px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.hintAccent {
+    color: var(--accent-dim);
+    font-weight: 600;
+}
+
+/* ---- Active pin indicator ------------------------------------------------- */
+.pinActive {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--accent);
+    padding: 6px 8px;
+    background: rgba(59, 130, 246, 0.06);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    border-radius: 6px;
+}
+
+.pinDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: pulse 1.4s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.pinUnpin {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--danger);
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+
+.pinUnpin:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* ---- Toggle Group --------------------------------------------------------- */
+.toggleGroup {
+    display: flex;
+    background: rgba(255, 255, 255, 0.3);
+    padding: 3px;
+    border-radius: 12px;
+    margin-top: 4px;
+    border: 1px solid var(--panel-border-edge);
+}
+
+.toggleBtn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 9px;
+    transition: all 0.2s ease;
+}
+
+.toggleBtn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.toggleActive {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: white;
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 9px;
+    cursor: default;
+}
