@@ -3,9 +3,9 @@ import type { HeatmapBin, HeatmapSlice, OrderBookStore, Price, Quantity, Timesta
 /**
  * The maximum price index supported by the flat bin buffer.
  * Covers BTC/USDT up to $500,000 with binSize = 1.
- * Cost: 500,000 × 8 bytes = 4.0 MB, allocated once per worker lifetime.
+ * Cost: 200,000 × 8 bytes = 1.6 MB, allocated once per worker lifetime.
  */
-const MAX_BIN_INDEX = 500_000;
+const MAX_BIN_INDEX = 200_000;
 /**
  * Maximum number of unique price bins we can track in a single slice.
  * Covers extremely fragmented books or high-depth renders.
@@ -30,7 +30,7 @@ export class HeatmapProcessor {
     /**
      * Tracks which indices of buffers were written in the current call,
      * so that only those entries need zeroing after the pass — avoiding a
-     * full 4 MB memset on every tick. Split by side.
+     * full 1.6 MB memset on every tick. Split by side.
      */
     private readonly askActiveIndices = new Int32Array(MAX_ACTIVE_BINS);
     private askActiveCount = 0;
@@ -123,8 +123,8 @@ export class HeatmapProcessor {
      * Applies rank normalisation — the theoretically optimal transform for
      * power-law distributed order book volumes.
      *
-     * Mandatory 5-step discrete quantisation (Weather Radar style) is applied.
-     * Optimized to sort indices in-place on a TypedArray subarray, reducing GC pressure.
+     * 5-step discrete quantisation (Weather Radar style) is applied.
+     * Optimised to sort indices in-place on a TypedArray subarray, reducing GC pressure.
      *
      * @param buffer - The flat quantity buffer.
      * @param activeIndices - Indices that contain non-zero quantities.

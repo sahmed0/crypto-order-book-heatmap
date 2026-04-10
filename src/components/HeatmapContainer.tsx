@@ -247,7 +247,7 @@ export default function HeatmapContainer() {
                 'padding-right': '4px',
                 background: 'transparent',
             }}>
-                {/* We need to ensure each child has width 100% or matches the container */}
+                {/* Ensure each child has width 100% or matches the container */}
                 <div style={{ width: '100%' }}>
                     <Show when={service()}>
                         {(s) => (

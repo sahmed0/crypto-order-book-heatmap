@@ -29,7 +29,7 @@ export default function PriceAxis(props: PriceAxisProps) {
 
         if (height <= 0 || span <= 0) return [];
 
-        const idealSpacing = span / 8;
+        const idealSpacing = span / 5;
         const magnitude = Math.pow(10, Math.floor(Math.log10(idealSpacing)));
         let interval = magnitude;
         if (idealSpacing / magnitude >= 5) interval = magnitude * 5;
@@ -68,7 +68,7 @@ export default function PriceAxis(props: PriceAxisProps) {
     const midPriceDecimals = createMemo(() => {
         const span = props.priceSpan();
         if (span === 0) return 2;
-        const idealSpacing = span / 8;
+        const idealSpacing = span / 5;
         const magnitude = Math.pow(10, Math.floor(Math.log10(idealSpacing)));
         let interval = magnitude;
         if (idealSpacing / magnitude >= 5) interval = magnitude * 5;
