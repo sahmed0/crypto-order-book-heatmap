@@ -60,7 +60,7 @@ export default function PricePin(props: PricePinProps) {
         const span = props.priceSpan();
         let decimals = 0;
         if (span > 0) {
-            const idealSpacing = span / 8;
+            const idealSpacing = span / 5;
             const magnitude = Math.pow(10, Math.floor(Math.log10(idealSpacing)));
             let interval = magnitude;
             if (idealSpacing / magnitude >= 5) interval = magnitude * 5;

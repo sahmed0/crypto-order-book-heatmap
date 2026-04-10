@@ -2,7 +2,7 @@ import type { HeatmapBin, HeatmapSlice, OrderBookStore, Price, Quantity, Timesta
 
 /**
  * The maximum price index supported by the flat bin buffer.
- * Covers BTC/USDT up to $500,000 with binSize = 1.
+ * Covers BTC/USDT up to $200,000 with binSize = 1.
  * Cost: 200,000 × 8 bytes = 1.6 MB, allocated once per worker lifetime.
  */
 const MAX_BIN_INDEX = 200_000;

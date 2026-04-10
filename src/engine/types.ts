@@ -7,7 +7,7 @@
  * Core constants for viewport management.
  */
 export const DEFAULT_PRICE_SPAN = 1000;
-export const MIN_PRICE_SPAN = 1;
+export const MIN_PRICE_SPAN = 50;
 export const MAX_PRICE_SPAN = 20000;
 
 /**
