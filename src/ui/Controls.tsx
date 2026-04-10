@@ -18,7 +18,7 @@ export interface ControlsProps {
 }
 
 const DEPTH_OPTIONS = [5, 10, 20, 50, 100, 500, 1000, 5000];
-const BIN_SIZE_OPTIONS = [1, 5, 10, 50, 100];
+const BIN_SIZE_OPTIONS = [2, 5, 10, 50, 100];
 const TIME_RANGE_OPTIONS = [5, 10, 15, 20, 30, 60, 120, 180];
 
 /**
