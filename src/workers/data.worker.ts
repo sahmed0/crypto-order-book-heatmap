@@ -261,7 +261,7 @@ export class BinanceConnector {
         this.updateBook(this.asks, this.pendingAsks, event.a, true);
         this.updateBook(this.bids, this.pendingBids, event.b, false);
 
-        // Ensure we maintain a maximum of 5000 levels on each side (total 10000)
+        // Ensure we maintain a maximum of 5000 levels on each side (total 10,000)
         pruneOrderBookSide(this.asks, ORDER_BOOK_DEPTH_PER_SIDE);
         pruneOrderBookSide(this.bids, ORDER_BOOK_DEPTH_PER_SIDE);
 
@@ -346,7 +346,7 @@ export class BinanceConnector {
                 currentMidPrice,
                 this.currentDepth
             );
-            emit({ type: 'RENDER_SLICE', payload: slice });
+            emit({ type: 'RENDER_SLICE', payload: slice, binSize: this.currentBinSize });
 
         }, 100);
     }

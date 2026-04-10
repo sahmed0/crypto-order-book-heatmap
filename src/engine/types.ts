@@ -7,7 +7,7 @@
  * Core constants for viewport management.
  */
 export const DEFAULT_PRICE_SPAN = 1000;
-export const MIN_PRICE_SPAN = 50;
+export const MIN_PRICE_SPAN = 1;
 export const MAX_PRICE_SPAN = 20000;
 
 /**
@@ -98,7 +98,7 @@ export type WorkerMessage =
     | { readonly type: 'INITIALISE_SNAPSHOT'; readonly payload: SnapshotPayload }
     | { readonly type: 'DEPTH_UPDATE'; readonly payload: DepthDeltaPayload }
     | { readonly type: 'RENDER_FRAME'; readonly payload: Readonly<RenderPayload> }
-    | { readonly type: 'RENDER_SLICE'; readonly payload: HeatmapSlice }
+    | { readonly type: 'RENDER_SLICE'; readonly payload: HeatmapSlice, binSize: number }
     | { readonly type: 'MID_PRICE_UPDATE'; readonly payload: number }
     | { readonly type: 'CLEAR_HEATMAP' }
     | { readonly type: 'ERROR'; readonly message: string };

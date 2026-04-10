@@ -21,13 +21,6 @@ export interface InitRenderWorkerPayload {
 }
 
 // ---------------------------------------------------------------------------
-// Palette definitions
-// Each stop: [normalised position 0-1, R, G, B]
-// ---------------------------------------------------------------------------
-
-// Palette imports handled centrally
-
-// ---------------------------------------------------------------------------
 // Renderer class
 // ---------------------------------------------------------------------------
 
@@ -64,7 +57,6 @@ export class HeatmapRenderer {
     private timeRangeSeconds: number = 10;
     private latestTimestamp: number = 0;
 
-
     private getShiftX(): number {
         if (this.width <= 0) return 1;
         // Calculate number of slices based on the time range, assuming 100ms (10 slices per second)
@@ -77,8 +69,8 @@ export class HeatmapRenderer {
     private isAutoCentring: boolean = true;
 
     // ---- Circular TypedArray Buffer State ----
-    // MAX_HISTORY = 2000 slices (~3.3 minutes at 10 slices/sec)
-    private readonly MAX_HISTORY = 2000;
+    // MAX_HISTORY = 1800 slices (3 minutes at 10 slices/sec)
+    private readonly MAX_HISTORY = 1800;
     private historyWriteIdx = 0;
     private historyCount = 0;
 
@@ -87,7 +79,7 @@ export class HeatmapRenderer {
     
     // Bin Data: [lowerPrice, intensity, rawQty] triplets. 
     // Fixed allocation: 1000 bins max per slice (500 per side). 
-    // Total: 2000 * 1000 * 3 * 4 bytes = ~24MB
+    // Total: 1800 * 1000 * 3 * 4 bytes = ~21.6MB
     private readonly MAX_BINS_PER_SLICE = 1000;
     private readonly binBuffer = new Float32Array(this.MAX_HISTORY * this.MAX_BINS_PER_SLICE * 3);
 
@@ -101,6 +93,7 @@ export class HeatmapRenderer {
     private minVolume: number = 0;
     /** Pinned price in USD, or null when no pin is active. */
     private pinnedPrice: number | null = null;
+    private binSize: number = 10;
 
     // Debug metrics & smoothing state
     private fpsCounter = 0;
@@ -203,6 +196,11 @@ export class HeatmapRenderer {
             } else if (data.type === 'PIN_PRICE') {
                 this.pinnedPrice = data.price as number | null;
                 logInfo('RENDER', `Pinned price set to ${this.pinnedPrice}`);
+            }
+
+            else if (data.type === 'SET_BIN_SIZE') {
+                this.binSize = data.value as number;
+                logInfo('RENDER', `Bin size set to ${this.binSize}`);
             }
         };
     }
@@ -473,7 +471,7 @@ export class HeatmapRenderer {
         const bidCount = this.metadataBuffer[mBase + 3];
         
         const halfSpan = this.priceSpanVisible / 2;
-        const effectiveCentre = this.centrePrice; 
+        const effectiveCentre = this.centrePrice;
         const pricesPerPixel = this.priceSpanVisible / this.height;
         const topViewportPrice = effectiveCentre + halfSpan;
 
@@ -493,12 +491,8 @@ export class HeatmapRenderer {
 
                 const distanceFromTop = topViewportPrice - lowerPriceBound;
                 const exactYStart = distanceFromTop / pricesPerPixel;
-                // binSize is fixed in DataWorker binner. 
-                // Since we don't store upperPriceBound, we assume it's one bin away.
-                // However, upperPriceBound - lowerPriceBound = binSize.
-                // We don't have binSize here easily. We should have passed it.
-                // Let's approximate based on the diff if we had more bins, or use a fixed value.
-                const binSize = 10; 
+
+                const binSize = this.binSize; 
                 const exactHeight = binSize / pricesPerPixel;
                 const exactYEnd = exactYStart + exactHeight;
 
