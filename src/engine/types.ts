@@ -111,7 +111,7 @@ export type PaletteName = 'viridis' | 'magma';
 /**
  * Supported cryptocurrency pairs.
  */
-export const SUPPORTED_PAIRS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+export const SUPPORTED_PAIRS = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'TAOUSDT', 'DOGEUSDT'];
 
 /**
  * Messages sent from the main-thread UI layer (workerBroker) to the RenderWorker.
