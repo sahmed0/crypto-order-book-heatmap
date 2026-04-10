@@ -44,7 +44,7 @@ export class HeatmapRenderer {
 
     // coverage buffer property
     private coverageScratchpad: Float32Array | null = null;
-private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
+    private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
     // Pre-allocated zero-allocation hot-path buffer
     private columnImageData: ImageData | null = null;
@@ -55,7 +55,7 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
     // Viewport tracking
     private centrePrice: Price = 0 as Price;
-    private previousCentrePrice: Price = 0 as Price;
+    // private previousCentrePrice: Price = 0 as Price; // part of OLD WAY of Out-of-Bounds Clearance
     private priceSpanVisible: number = DEFAULT_PRICE_SPAN;
     private timeScale: number = 1;
     private timeRangeSeconds: number = 10;
@@ -134,7 +134,7 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
     public clear(): void {
         this.historyWriteIdx = 0;
         this.historyCount = 0;
-        this.previousCentrePrice = 0 as Price;
+        // this.previousCentrePrice = 0 as Price; // part of OLD WAY of Out-of-Bounds Clearance
         this.needsFullRedraw = true;
         
         if (this.trackerCtx) {
@@ -336,14 +336,25 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
         const shiftX = this.getShiftX();
 
-        // Out-of-Bounds Clearance — flush tracker if price jumps more than half the viewport
+        // NEW WAY - Decide if we can use the fast shift-path or need a full redraw
+        if (!this.renderCentrePrice) this.renderCentrePrice = this.centrePrice;
+
+        const pricesPerPixel = this.priceSpanVisible / this.height;
+        const maxPixelDrift = this.height / 4; // Allow 25% of the screen to drift before redrawing
+
+        // If the camera has panned too far, trigger a clean redraw
+        if (Math.abs(this.centrePrice - this.renderCentrePrice) > maxPixelDrift * pricesPerPixel) {
+            this.needsFullRedraw = true;
+        }
+
+        /* // OLD WAY - Out-of-Bounds Clearance — flush tracker if price jumps more than half the viewport
         if (
             this.previousCentrePrice !== 0 &&
             Math.abs(this.centrePrice - this.previousCentrePrice) > this.priceSpanVisible / 2 &&
             this.isAutoCentring
         ) {
             this.needsFullRedraw = true;
-        }
+        } */
 
         // 2. Decide if we can use the fast shift-path or need a full redraw
         if (this.needsFullRedraw) {
@@ -359,7 +370,7 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
             // Draw the mid-price line segment for this frame
             if (this.historyCount > 1 && slice.midPrice > 0) {
                 const prevIdx = (this.historyWriteIdx - 2 + this.MAX_HISTORY) % this.MAX_HISTORY;
-                const prevMidPrice = this.metadataBuffer[prevIdx * 4 + 1];
+                const prevMidPrice = this.metadataBuffer[prevIdx * 5 + 1];
 
                 if (prevMidPrice > 0) {
                     this.trackerCtx.beginPath();
@@ -377,7 +388,7 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
             this.reportViewportUpdate(slice.timestamp, volume, side, slice.askVolumeThresholds, slice.bidVolumeThresholds);
         }
 
-        this.previousCentrePrice = this.centrePrice;
+        // this.previousCentrePrice = this.centrePrice; // part of OLD WAY Out-of-Bounds Clearance (see above)
 
         // Record timestamp for animation
         this.lastSliceTime = performance.now();
@@ -385,6 +396,8 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
     private redrawEntireBuffer(): void {
         if (!this.trackerCtx || !this.columnImageData || !this.columnDataView || !this.columnScratchpad || !this.trackerCanvas) return;
+
+        this.renderCentrePrice = this.centrePrice;
 
         const shiftX = this.getShiftX();
         const intShiftX = Math.ceil(shiftX);
@@ -561,7 +574,7 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
     private priceToY(price: number): number {
         const halfSpan = this.priceSpanVisible / 2;
-        const effectiveCentre = this.centrePrice;
+        const effectiveCentre = this.renderCentrePrice || this.centrePrice;
         const topViewportPrice = effectiveCentre + halfSpan;
         const pricesPerPixel = this.priceSpanVisible / this.height;
         return (topViewportPrice - price) / pricesPerPixel;
@@ -610,16 +623,23 @@ private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
 
         // At 100ms elapsed, progress = 1.0 (fully slid left)
         const progress = Math.min(1, elapsed / 100);
-
         // Offset starts at +intShiftX, and smoothly glides to 0 as 100ms passes
         const currentOffset = intShiftX * (1 - progress);
 
-        // We draw the tracker canvas shifted left by `intShiftX` to discard the leftmost "buffer" column
-        this.mainCtx.drawImage(this.trackerCanvas, -intShiftX + currentOffset, 0);
+        // Calculate vertical visual drift (parallax offset)
+        const pricesPerPixel = this.priceSpanVisible / this.height;
+        const dy = this.renderCentrePrice ? (this.centrePrice - this.renderCentrePrice) / pricesPerPixel : 0;
 
-        // Draw horizontal reference line at latest midPrice
+        // Clear mainCtx to white to prevent trailing edge smears
+        this.mainCtx.fillStyle = '#ffffff';
+        this.mainCtx.fillRect(0, 0, this.width, this.height);
+
+        // Draw the tracker canvas shifted left by `intShiftX` to discard the leftmost "buffer" column and vertically by `dy`
+        this.mainCtx.drawImage(this.trackerCanvas, -intShiftX + currentOffset, dy);
+
+        // Draw horizontal reference line exactly in the middle
         if (this.midPrice > 0) {
-            const y = this.priceToY(this.midPrice);
+            const y = this.priceToY(this.midPrice) + dy;
             this.mainCtx.beginPath();
             this.mainCtx.setLineDash([5, 5]);
             this.mainCtx.moveTo(0, y);
