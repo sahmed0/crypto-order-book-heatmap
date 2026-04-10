@@ -42,6 +42,10 @@ export class HeatmapRenderer {
     private height = 0;
     private pixelRatio = 1;
 
+    // coverage buffer property
+    private coverageScratchpad: Float32Array | null = null;
+private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
+
     // Pre-allocated zero-allocation hot-path buffer
     private columnImageData: ImageData | null = null;
     private columnDataView: Uint32Array | null = null;
@@ -75,7 +79,7 @@ export class HeatmapRenderer {
     private historyCount = 0;
 
     // Metadata: [timestamp, midPrice, askBinCount, bidBinCount] per slice
-    private readonly metadataBuffer = new Float64Array(this.MAX_HISTORY * 4);
+    private readonly metadataBuffer = new Float64Array(this.MAX_HISTORY * 5);
     
     // Bin Data: [lowerPrice, intensity, rawQty] triplets. 
     // Fixed allocation: 1000 bins max per slice (500 per side). 
@@ -199,7 +203,7 @@ export class HeatmapRenderer {
             }
 
             else if (data.type === 'SET_BIN_SIZE') {
-                this.binSize = data.value as number;
+                this.binSize = data.payload as number;
                 logInfo('RENDER', `Bin size set to ${this.binSize}`);
             }
         };
@@ -222,10 +226,9 @@ export class HeatmapRenderer {
                     this.centrePrice = this.midPrice as Price;
                 }
 
-
-
             } else if (portData.type === 'RENDER_SLICE') {
                 const slice = portData.payload as HeatmapSlice;
+                this.binSize = portData.binSize; // grab bin size from data worker
                 this.pushToHistory(slice);
                 this.drawSlice(slice);
             }
@@ -238,11 +241,12 @@ export class HeatmapRenderer {
         const idx = this.historyWriteIdx;
         
         // 1. Pack Metadata
-        const mBase = idx * 4;
+        const mBase = idx * 5;
         this.metadataBuffer[mBase] = slice.timestamp;
         this.metadataBuffer[mBase + 1] = slice.midPrice;
         this.metadataBuffer[mBase + 2] = slice.askBins.length;
         this.metadataBuffer[mBase + 3] = slice.bidBins.length;
+        this.metadataBuffer[mBase + 4] = this.binSize;
 
         // 2. Pack Bins
         const bBase = idx * this.MAX_BINS_PER_SLICE * 3;
@@ -302,6 +306,7 @@ export class HeatmapRenderer {
 
         // Scratchpad of Float32 vectors for smooth R, G, B blending
         this.columnScratchpad = new Float32Array(this.height * 3);
+        this.coverageScratchpad = new Float32Array(this.height);
         
         this.needsFullRedraw = true;
     }
@@ -403,7 +408,7 @@ export class HeatmapRenderer {
             if (i === 0) {
                 lastPinnedVol = volume;
                 lastPinnedSide = side;
-                lastTimestamp = this.metadataBuffer[logicalIdx * 4];
+                lastTimestamp = this.metadataBuffer[logicalIdx * 5];
                 
                 const tBase = logicalIdx * 10;
                 lastAskThresholds = Array.from(this.thresholdBuffer.subarray(tBase, tBase + 5));
@@ -422,7 +427,7 @@ export class HeatmapRenderer {
             
             for (let i = 0; i < this.historyCount; i++) {
                 const logicalIdx = (this.historyWriteIdx - this.historyCount + i + this.MAX_HISTORY) % this.MAX_HISTORY;
-                const midPrice = this.metadataBuffer[logicalIdx * 4 + 1];
+                const midPrice = this.metadataBuffer[logicalIdx * 5 + 1];
                 if (midPrice === 0) continue;
 
                 const offsetFromEnd = (this.historyCount - 1 - i);
@@ -463,15 +468,17 @@ export class HeatmapRenderer {
 
         const dataView = this.columnDataView!;
         const imgData = this.columnImageData!;
-        this.columnScratchpad.fill(255);
+        this.columnScratchpad.fill(0);
+        this.coverageScratchpad!.fill(0);
         dataView.fill(0xFFFFFFFF);
 
-        const mBase = historyIdx * 4;
+        const mBase = historyIdx * 5;
         const askCount = this.metadataBuffer[mBase + 2];
         const bidCount = this.metadataBuffer[mBase + 3];
+        const historicalBinSize = this.metadataBuffer[mBase + 4];
         
         const halfSpan = this.priceSpanVisible / 2;
-        const effectiveCentre = this.centrePrice;
+        const effectiveCentre = this.renderCentrePrice || this.centrePrice;
         const pricesPerPixel = this.priceSpanVisible / this.height;
         const topViewportPrice = effectiveCentre + halfSpan;
 
@@ -489,11 +496,10 @@ export class HeatmapRenderer {
 
                 if (aggregatedQuantity < this.minVolume) continue;
 
-                const distanceFromTop = topViewportPrice - lowerPriceBound;
+                const distanceFromTop = topViewportPrice - (lowerPriceBound + historicalBinSize);
                 const exactYStart = distanceFromTop / pricesPerPixel;
 
-                const binSize = this.binSize; 
-                const exactHeight = binSize / pricesPerPixel;
+                const exactHeight = historicalBinSize / pricesPerPixel;
                 const exactYEnd = exactYStart + exactHeight;
 
                 const yMin = Math.max(0, Math.floor(exactYStart));
@@ -508,13 +514,20 @@ export class HeatmapRenderer {
                     if (coverage > 0) {
                         const idx = y * 3;
                         const scratch = this.columnScratchpad!;
-                        scratch[idx] = scratch[idx] * (1 - coverage) + rgb[0] * coverage;
-                        scratch[idx + 1] = scratch[idx + 1] * (1 - coverage) + rgb[1] * coverage;
-                        scratch[idx + 2] = scratch[idx + 2] * (1 - coverage) + rgb[2] * coverage;
+                        // Old way
+                        // scratch[idx] = scratch[idx] * (1 - coverage) + rgb[0] * coverage;
+                        // scratch[idx + 1] = scratch[idx + 1] * (1 - coverage) + rgb[1] * coverage;
+                        // scratch[idx + 2] = scratch[idx + 2] * (1 - coverage) + rgb[2] * coverage;
+
+                        // New way
+                        scratch[idx] += rgb[0] * coverage;
+                        scratch[idx + 1] += rgb[1] * coverage;
+                        scratch[idx + 2] += rgb[2] * coverage;
+                        this.coverageScratchpad![y] += coverage;
                     }
                 }
 
-                if (this.pinnedPrice !== null && this.pinnedPrice >= lowerPriceBound && this.pinnedPrice < lowerPriceBound + binSize) {
+                if (this.pinnedPrice !== null && this.pinnedPrice >= lowerPriceBound && this.pinnedPrice < lowerPriceBound + this.binSize) {
                     pinnedVolume = rawQuantity;
                     pinnedSide = side;
                 }
@@ -526,9 +539,17 @@ export class HeatmapRenderer {
 
         for (let y = 0; y < this.height; y++) {
             const idx = y * 3;
-            const r = Math.round(this.columnScratchpad[idx]);
-            const g = Math.round(this.columnScratchpad[idx + 1]);
-            const b = Math.round(this.columnScratchpad[idx + 2]);
+            const cov = Math.min(1, this.coverageScratchpad![y]);
+            const remainder = 1 - cov; // Any uncovered space in the pixel stays white
+            // Old way
+            // const r = Math.round(this.columnScratchpad[idx]);
+            // const g = Math.round(this.columnScratchpad[idx + 1]);
+            // const b = Math.round(this.columnScratchpad[idx + 2]);
+            // New way
+            const r = Math.min(255, Math.round(this.columnScratchpad![idx] + 255 * remainder));
+            const g = Math.min(255, Math.round(this.columnScratchpad![idx + 1] + 255 * remainder));
+            const b = Math.min(255, Math.round(this.columnScratchpad![idx + 2] + 255 * remainder));
+
             const c32 = this.packRGB([r, g, b]);
             const rowOffset = y * intShiftX;
             for (let x = 0; x < intShiftX; x++) dataView[rowOffset + x] = c32;
@@ -619,7 +640,7 @@ export class HeatmapRenderer {
      */
     private getRGBForIntensity(intensity: number, palette: PaletteName): RGB {
         const bands = PALETTE_BANDS[palette];
-        const levels = bands.length; // Will be 8
+        const levels = bands.length; // Will be 5
         // Calculate the discrete level (1 to N)
         const level = Math.round(intensity * levels);
         // Clamp to valid array indices (0 to N-1)
