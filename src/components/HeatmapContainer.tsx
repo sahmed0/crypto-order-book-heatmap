@@ -12,6 +12,7 @@ import { AdaptiveLegend } from '../ui/AdaptiveLegend';
 import { MIN_PRICE_SPAN, MAX_PRICE_SPAN } from '../engine/types';
 import { activeSymbol } from '../ui/store';
 import { HeatmapProvider } from '../core/HeatmapContext';
+import styles from './HeatmapContainer.module.css';
 
 export default function HeatmapContainer() {
     // ---- DOM refs --------------------------------------------------------
@@ -30,6 +31,7 @@ export default function HeatmapContainer() {
     const [pinnedPrice, setPinnedPrice] = createSignal<number | null>(null);
     const [isAutoCentring, setIsAutoCentring] = createSignal(true);
     const [timeScale, setTimeScale] = createSignal(1);
+    const [isSidebarOpen, setIsSidebarOpen] = createSignal(false);
 
     // ---- Canvas Interaction Handlers --------------------------------------
     createEffect(() => {
@@ -218,35 +220,27 @@ export default function HeatmapContainer() {
 
     // ---- JSX --------------------------------------------------------------
     return (
-        <div
-            style={{
-                display: 'grid',
-                'grid-template-columns': '260px 1fr',
-                'grid-template-rows': '1fr',
-                gap: '24px',
-                width: '100%',
-                height: '100%',
-                padding: '24px',
-                'box-sizing': 'border-box',
-                position: 'relative',
-                'z-index': '10',
-            }}
-        >
+        <div class={styles.container}>
+            {/* Sidebar toggle button (mobile only) */}
+            <button class={styles.toggleButton} onClick={() => setIsSidebarOpen(true)} aria-label="Toggle Settings">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            {/* Sidebar overlay (mobile only) */}
+            <div 
+                class={`${styles.sidebarOverlay} ${isSidebarOpen() ? styles.open : ''}`}
+                onClick={() => setIsSidebarOpen(false)}
+            />
+
             {/* ---- Left Sidebar: Controls, Pinned Info, Dashboard ---- */}
-            <div style={{
-                'grid-column': '1',
-                'grid-row': '1',
-                display: 'flex',
-                'flex-direction': 'column',
-                gap: '20px',
-                height: '100%',
-                'min-height': 0,
-                'overflow-y': 'auto',
-                'scrollbar-width': 'none', /* Firefox */
-                '-ms-overflow-style': 'none', /* IE/Edge */
-                'padding-right': '4px',
-                background: 'transparent',
-            }}>
+            <div class={`${styles.sidebar} ${isSidebarOpen() ? styles.open : ''}`}>
+                <button class={styles.closeButton} onClick={() => setIsSidebarOpen(false)} aria-label="Close Settings">
+                    ✕
+                </button>
                 {/* Ensure each child has width 100% or matches the container */}
                 <div style={{ width: '100%' }}>
                     <Show when={service()}>
@@ -263,24 +257,7 @@ export default function HeatmapContainer() {
                 </div>
 
                 {/* ---- Pinned Price & Volume Bento Section ---- */}
-                <div style={{
-                    width: '100%',
-                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9))',
-                    'backdrop-filter': 'blur(8px) saturate(2)',
-                    '-webkit-backdrop-filter': 'blur(8px) saturate(2)',
-                    'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
-                    border: '1px solid rgba(255, 255, 255, 0.4)',
-                    'border-top': '1px solid rgba(255, 255, 255, 0.7)',
-                    'border-left': '1px solid rgba(255, 255, 255, 0.7)',
-                    'border-radius': '24px',
-                    padding: '24px',
-                    'font-family': "'Inter', 'Segoe UI', system-ui, sans-serif",
-                    display: 'flex',
-                    'flex-direction': 'column',
-                    gap: '8px',
-                    'box-sizing': 'border-box',
-                    cursor: 'default',
-                }}>
+                <div class={styles.bentoBox}>
                     <div style={{ display: 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '6px' }}>
                         <div style={{ 'font-weight': '800', color: '#3b82f6', 'font-size': '10px', 'letter-spacing': '0.12em', 'text-transform': 'uppercase', opacity: '0.8' }}>
                             PINNED LIQUIDITY
@@ -384,41 +361,8 @@ export default function HeatmapContainer() {
                 </div>
             </div>
 
-            <div style={{
-                position: 'relative',
-                'grid-column': '2',
-                'grid-row': '1',
-                display: 'grid',
-                'grid-template-columns': '56px 1fr 70px',
-                'grid-template-rows': '1fr 32px',
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9))',
-                'backdrop-filter': 'blur(8px) saturate(2)',
-                '-webkit-backdrop-filter': 'blur(8px) saturate(2)',
-                'border-radius': '32px',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                'border-top': '1px solid rgba(255, 255, 255, 0.7)',
-                'border-left': '1px solid rgba(255, 255, 255, 0.7)',
-                'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
-                padding: '32px',
-                'box-sizing': 'border-box',
-                'min-width': 0,
-                'min-height': 0,
-            }}>
-                <div style={{
-                    position: 'relative',
-                    'grid-column': '2',
-                    'grid-row': '1',
-                    width: '100%',
-                    height: '100%',
-                    border: '1px solid rgba(59, 130, 246, 0.12)',
-                    'border-bottom': '1px solid #1e293b',
-                    'border-right': '1px solid #1e293b',
-                    'box-sizing': 'border-box',
-                    'min-width': 0,
-                    'min-height': 0,
-                }}>
+            <div class={styles.mainArea}>
+                <div class={styles.chartContainer}>
                     <PricePin
                         pinnedPrice={pinnedPrice}
                         pinnedSide={pinnedSide}
@@ -439,19 +383,7 @@ export default function HeatmapContainer() {
                     />
                 </div>
 
-                <div style={{
-                    position: 'relative',
-                    'grid-column': '1',
-                    'grid-row': '1',
-                    width: '100%',
-                    height: '100%',
-                    'box-sizing': 'border-box',
-                    'padding-right': '8px',
-                    display: 'flex',
-                    'flex-direction': 'column',
-                    'min-width': 0,
-                    'min-height': 0,
-                }}>
+                <div class={styles.legendContainer}>
                     <AdaptiveLegend
                         askVolumeThresholds={askVolumeThresholds()}
                         bidVolumeThresholds={bidVolumeThresholds()}
@@ -459,20 +391,7 @@ export default function HeatmapContainer() {
                     />
                 </div>
 
-                <div ref={priceAxisRef!} style={{
-                    position: 'relative',
-                    'grid-column': '3',
-                    'grid-row': '1',
-                    width: '100%',
-                    height: '100%',
-                    'box-sizing': 'border-box',
-                    'border-top': '1px solid transparent',
-                    'border-bottom': '1px solid transparent',
-                    'min-width': 0,
-                    'min-height': 0,
-                    cursor: 'ns-resize',
-                    'touch-action': 'none',
-                }}>
+                <div ref={priceAxisRef!} class={styles.priceAxisContainer}>
                     <PriceAxis
                         centrePrice={centrePrice}
                         midPrice={midPrice}
@@ -481,20 +400,7 @@ export default function HeatmapContainer() {
                     />
                 </div>
 
-                <div ref={timeAxisRef!} style={{
-                    position: 'relative',
-                    'grid-column': '2',
-                    'grid-row': '2',
-                    width: '100%',
-                    height: '100%',
-                    'box-sizing': 'border-box',
-                    'border-left': '1px solid transparent',
-                    'border-right': '1px solid transparent',
-                    'min-width': 0,
-                    'min-height': 0,
-                    cursor: 'ew-resize',
-                    'touch-action': 'none',
-                }}>
+                <div ref={timeAxisRef!} class={styles.timeAxisContainer}>
                     <TimeAxis
                         latestTimestamp={latestTimestamp}
                         timeRangeMs={timeRangeMs}

@@ -1,0 +1,78 @@
+/* Copyright (c) 2026 Sajid Ahmed. All rights reserved. */
+
+.legendWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    width: 100%;
+}
+
+.title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #3b82f6;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    text-align: center;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    gap: 3px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    gap: 8px;
+}
+
+.colourBox {
+    width: 12px;
+    height: 100%;
+    border-radius: 3px;
+    min-height: 6px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.valueText {
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    font-family: 'Inter', system-ui, sans-serif;
+    white-space: nowrap;
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .item {
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .valueText {
+        font-size: 9px;
+    }
+    
+    .colourBox {
+        width: 8px;
+        border-radius: 2px;
+    }
+}
