@@ -33,7 +33,7 @@
     color: #1e293b;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
 }
 
 .symbol {
@@ -56,6 +56,21 @@
 }
 
 .githubLink:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.kiwiLink {
+    display: flex;
+    font-size: 3rem;
+    align-items: center;
+    color: #0062ff;
+    text-decoration: none;
+    transition: all 0.2s;
+    opacity: 0.8;
+}
+
+.kiwiLink:hover {
     opacity: 1;
     transform: scale(1.1);
 }

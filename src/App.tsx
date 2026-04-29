@@ -7,7 +7,12 @@ function App() {
     <div class={styles.appContainer}>
       <header class={styles.header}>
         <h1 class={styles.title}>
-          <svg style={{ height: "2rem", width: "2rem" }} fill="#F0B90B" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Binance</title><path d="M16.624 13.9202l2.7175 2.7154-7.353 7.353-7.353-7.352 2.7175-2.7164 4.6355 4.6595 4.6356-4.6595zm4.6366-4.6366L24 12l-2.7154 2.7164L18.5682 12l2.6924-2.7164zm-9.272.001l2.7163 2.6914-2.7164 2.7174v-.001L9.2721 12l2.7164-2.7154zm-9.2722-.001L5.4088 12l-2.6914 2.6924L0 12l2.7164-2.7164zM11.9885.0115l7.353 7.329-2.7174 2.7154-4.6356-4.6356-4.6355 4.6595-2.7174-2.7154 7.353-7.353z" /></svg>
+          <a href="https://sajidahmed.co.uk" target="_blank" rel="noopener noreferrer" class={styles.kiwiLink}>
+            <i class="kiwi-logo" />
+          </a>
+          <a href="https://www.binance.com/en-GB/orderbook/btc_usdt" target="_blank" rel="noopener noreferrer" class={styles.githubLink}>
+            <svg style={{ height: "3rem", width: "3rem" }} fill="#F0B90B" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Binance</title><path d="M16.624 13.9202l2.7175 2.7154-7.353 7.353-7.353-7.352 2.7175-2.7164 4.6355 4.6595 4.6356-4.6595zm4.6366-4.6366L24 12l-2.7154 2.7164L18.5682 12l2.6924-2.7164zm-9.272.001l2.7163 2.6914-2.7164 2.7174v-.001L9.2721 12l2.7164-2.7154zm-9.2722-.001L5.4088 12l-2.6914 2.6924L0 12l2.7164-2.7164zM11.9885.0115l7.353 7.329-2.7174 2.7154-4.6356-4.6356-4.6355 4.6595-2.7174-2.7154 7.353-7.353z" /></svg>
+          </a>
           <span class={styles.symbol}>{activeSymbol().replace('USDT', '/USDT')}</span>{' '}
           <span class={styles.titleText}>Binance Order Book Heatmap</span>
         </h1>
@@ -19,7 +24,7 @@ function App() {
             rel="noopener noreferrer"
             class={styles.githubLink}
           >
-            <svg height="24" width="24" viewBox="0 0 16 16" fill="currentColor">
+            <svg height="40" width="40" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
             </svg>
           </a>
@@ -28,13 +33,13 @@ function App() {
             &copy; 2026 Sajid Ahmed<br />All Rights Reserved
           </span>
         </div>
-      </header>
+      </header >
 
       <main class={styles.mainContent}>
         {/* Switch back to live container */}
         <HeatmapContainer />
       </main>
-    </div>
+    </div >
   );
 }
 
