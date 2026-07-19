@@ -681,5 +681,9 @@ export class HeatmapRenderer {
     }
 }
 
-// Initialise the Renderer background worker
-new HeatmapRenderer();
+// Initialise the Renderer background worker.
+// Guarded so importing this module in tests (Node, no worker scope) has no side effect.
+declare const WorkerGlobalScope: { prototype: object; new (): object } | undefined;
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+    new HeatmapRenderer();
+}
