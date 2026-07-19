@@ -17,12 +17,12 @@ export default function TimeAxis(props: TimeAxisProps) {
 
         // Add 3 more markers at 75%, 50%, 25%
         for (let i = 1; i <= 3; i++) {
-            const ratio = 1 - (i * 0.25);
-            const ts = latest - (range * (1 - ratio));
-            result.push({ 
-                label: formatTime(ts), 
+            const ratio = 1 - i * 0.25;
+            const ts = latest - range * (1 - ratio);
+            result.push({
+                label: formatTime(ts),
                 left: `${ratio * 100}%`,
-                align: 'center'
+                align: 'center',
             });
         }
 
@@ -38,40 +38,48 @@ export default function TimeAxis(props: TimeAxisProps) {
     }
 
     return (
-        <div style={{
-            width: '100%',
-            height: '100%',
-            position: 'relative',
-            overflow: 'hidden',
-        }}>
+        <div
+            style={{
+                width: '100%',
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden',
+            }}
+        >
             <For each={markers()}>
                 {(marker: any) => (
-                    <div style={{
-                        position: 'absolute',
-                        left: marker.left,
-                        bottom: '0',
-                        transform: marker.align === 'right' ? 'translateX(-100%)' : 'translateX(-50%)',
-                        display: 'flex',
-                        'flex-direction': 'column',
-                        'align-items': marker.align === 'right' ? 'flex-end' : 'center',
-                    }}>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            left: marker.left,
+                            bottom: '0',
+                            transform: marker.align === 'right' ? 'translateX(-100%)' : 'translateX(-50%)',
+                            display: 'flex',
+                            'flex-direction': 'column',
+                            'align-items': marker.align === 'right' ? 'flex-end' : 'center',
+                        }}
+                    >
                         {/* Tick Mark */}
-                        <div style={{
-                            width: '1px',
-                            height: '6px',
-                            background: 'rgba(59, 130, 246, 0.3)',
-                            'margin-right': marker.align === 'right' ? '2px' : '0',
-                        }} />
-                        
-                        <div style={{
-                            'font-size': '10px',
-                            'font-weight': 700,
-                            color: '#94a3b8',
-                            'margin-top': '4px',
-                            'white-space': 'nowrap',
-                            'font-family': "'Inter', system-ui, sans-serif",
-                            opacity: 0.9,
-                        }}>
+                        <div
+                            style={{
+                                width: '1px',
+                                height: '6px',
+                                background: 'rgba(59, 130, 246, 0.3)',
+                                'margin-right': marker.align === 'right' ? '2px' : '0',
+                            }}
+                        />
+
+                        <div
+                            style={{
+                                'font-size': '10px',
+                                'font-weight': 700,
+                                color: '#94a3b8',
+                                'margin-top': '4px',
+                                'white-space': 'nowrap',
+                                'font-family': "'Inter', system-ui, sans-serif",
+                                opacity: 0.9,
+                            }}
+                        >
                             {marker.label}
                         </div>
                     </div>

@@ -56,7 +56,7 @@ export default function PricePin(props: PricePinProps) {
     const formattedPrice = createMemo(() => {
         const p = props.pinnedPrice();
         if (p === null) return '';
-        
+
         const span = props.priceSpan();
         let decimals = 0;
         if (span > 0) {
@@ -68,7 +68,7 @@ export default function PricePin(props: PricePinProps) {
             decimals = interval < 1 ? Math.abs(Math.floor(Math.log10(interval))) : 0;
         }
 
-        return `$${p.toLocaleString('en-GB', { minimumFractionDigits: decimals, maximumFractionDigits: decimals})}`;
+        return `$${p.toLocaleString('en-GB', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
     });
 
     const pinColour = createMemo(() => {
@@ -92,32 +92,36 @@ export default function PricePin(props: PricePinProps) {
                 }}
             >
                 {/* Dashed horizontal rule: matches the 3-physical-pixel width and [5,5] dash of the reference line */}
-                <div style={{
-                    width: '100%',
-                    height: `${3 / (window.devicePixelRatio || 1)}px`,
-                    'background-image': `linear-gradient(to right, ${pinColour()} 50%, transparent 50%)`,
-                    'background-size': `${10 / (window.devicePixelRatio || 1)}px 100%`,
-                    'background-repeat': 'repeat-x',
-                    'transform': 'translateY(-50%)',
-                }} />
+                <div
+                    style={{
+                        width: '100%',
+                        height: `${3 / (window.devicePixelRatio || 1)}px`,
+                        'background-image': `linear-gradient(to right, ${pinColour()} 50%, transparent 50%)`,
+                        'background-size': `${10 / (window.devicePixelRatio || 1)}px 100%`,
+                        'background-repeat': 'repeat-x',
+                        transform: 'translateY(-50%)',
+                    }}
+                />
 
                 {/* Price label at the right edge over the axis */}
-                <div style={{
-                    position: 'absolute',
-                    left: '100%',
-                    top: '0',
-                    transform: 'translateY(-50%)',
-                    background: pinColour(),
-                    padding: '2px 4px',
-                    'border-radius': '2px',
-                    'font-family': "'Inter', 'Segoe UI', monospace",
-                    'font-size': '11px',
-                    'font-weight': '600',
-                    color: '#000000',
-                    'white-space': 'nowrap',
-                    'margin-left': '4px',
-                    'z-index': 20,
-                }}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: '100%',
+                        top: '0',
+                        transform: 'translateY(-50%)',
+                        background: pinColour(),
+                        padding: '2px 4px',
+                        'border-radius': '2px',
+                        'font-family': "'Inter', 'Segoe UI', monospace",
+                        'font-size': '11px',
+                        'font-weight': '600',
+                        color: '#000000',
+                        'white-space': 'nowrap',
+                        'margin-left': '4px',
+                        'z-index': 20,
+                    }}
+                >
                     {formattedPrice()}
                 </div>
             </div>

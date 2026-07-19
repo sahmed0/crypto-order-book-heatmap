@@ -10,7 +10,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     background: linear-gradient(-145deg, rgb(244, 254, 255) 35%, rgb(239, 248, 255) 100%);
     background-size: 400% 400%;
@@ -24,9 +25,15 @@ html, body {
 }
 
 @keyframes gradientBG {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 #root {

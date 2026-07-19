@@ -23,7 +23,7 @@ export type Timestamp = number & { readonly __brand: 'Timestamp' };
  * This structure is vastly faster to iterate and garbage-collect than a Map.
  */
 export interface OrderBookSide {
-    prices: number[];     // Sorted array of prices
+    prices: number[]; // Sorted array of prices
     quantities: number[]; // Quantities corresponding to the prices array index
 }
 

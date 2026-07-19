@@ -23,7 +23,7 @@ export function cssYToPrice(
     priceSpan: number,
 ): number {
     const topPrice = centrePrice + priceSpan / 2;
-    const fraction = clickYCss / canvasHeightCss;       // 0 = top, 1 = bottom
+    const fraction = clickYCss / canvasHeightCss; // 0 = top, 1 = bottom
     const rawPrice = topPrice - fraction * priceSpan;
 
     // Snap to the nearest $1 bin and ensure non-negative
@@ -57,7 +57,6 @@ export function priceToCssY(
  * @returns A human-readable string representation of the state.
  */
 export function wsReadyStateLabel(state: number): string {
-
     const labels: Record<number, string> = {
         0: 'CONNECTING',
         1: 'OPEN',

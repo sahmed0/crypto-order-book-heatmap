@@ -10,18 +10,18 @@ export type RGB = readonly [number, number, number];
  * Carefully selected for maximum legibility in "Weather Radar" mode.
  */
 export const PALETTE_BANDS: Record<PaletteName, RGB[]> = {
-    'magma': [
-        [20, 10, 40],   // Deep Purple
+    magma: [
+        [20, 10, 40], // Deep Purple
         [120, 30, 120], // Mid Purple
-        [220, 60, 50],  // Red-Orange
+        [220, 60, 50], // Red-Orange
         [250, 180, 20], // Amber
-        [255, 240, 50]  // Yellow
+        [255, 240, 50], // Yellow
     ],
-    'viridis': [
-        [68, 1, 84],    // Deep Purple
-        [62, 74, 137],  // Blue
+    viridis: [
+        [68, 1, 84], // Deep Purple
+        [62, 74, 137], // Blue
         [33, 145, 140], // Dark Green
         [144, 215, 67], // Lime
-        [253, 231, 37]  // Yellow
+        [253, 231, 37], // Yellow
     ],
 };

@@ -79,9 +79,9 @@ export class HeatmapRenderer {
 
     // Metadata: [timestamp, midPrice, askBinCount, bidBinCount, binSize] per slice
     private readonly metadataBuffer = new Float64Array(this.MAX_HISTORY * 5);
-    
-    // Bin Data: [lowerPrice, intensity, rawQty] triplets. 
-    // Fixed allocation: 1000 bins max per slice (500 per side). 
+
+    // Bin Data: [lowerPrice, intensity, rawQty] triplets.
+    // Fixed allocation: 1000 bins max per slice (500 per side).
     // Total: 1800 * 1000 * 3 * 4 bytes = ~21.6MB
     private readonly MAX_BINS_PER_SLICE = 1000;
     private readonly binBuffer = new Float32Array(this.MAX_HISTORY * this.MAX_BINS_PER_SLICE * 3);
@@ -124,7 +124,7 @@ export class HeatmapRenderer {
                     width: this.width,
                     height: this.height,
                     fps: this.fpsCounter / 2, // Interval is 2000ms
-                }
+                },
             });
             this.fpsCounter = 0;
         }, 2000);
@@ -134,13 +134,13 @@ export class HeatmapRenderer {
         this.historyWriteIdx = 0;
         this.historyCount = 0;
         this.needsFullRedraw = true;
-        
+
         if (this.trackerCtx) {
             const intShiftX = Math.ceil(this.getShiftX());
             this.trackerCtx.fillStyle = '#ffffff';
             this.trackerCtx.fillRect(0, 0, this.width + intShiftX, this.height);
         }
-        
+
         if (this.mainCtx) {
             this.mainCtx.fillStyle = '#ffffff';
             this.mainCtx.fillRect(0, 0, this.width, this.height);
@@ -152,41 +152,29 @@ export class HeatmapRenderer {
             const data = e.data;
 
             if (data.type === 'INIT_CANVAS' || data.type === 'INIT_RENDERER') {
-                this.initialise(
-                    (data.canvas ?? data.payload?.canvas) as OffscreenCanvas
-                );
-
+                this.initialise((data.canvas ?? data.payload?.canvas) as OffscreenCanvas);
             } else if (data.type === 'RENDER_SLICE' && this.mainCtx) {
                 this.pushToHistory(data.payload as HeatmapSlice);
                 this.drawSlice(data.payload as HeatmapSlice);
-
             } else if (data.type === 'SET_ZOOM') {
                 this.priceSpanVisible = data.payload;
                 this.needsFullRedraw = true;
-
             } else if (data.type === 'SET_PAN') {
                 this.centrePrice = data.payload as Price;
                 this.isAutoCentring = false;
                 this.needsFullRedraw = true;
-
             } else if (data.type === 'SET_AUTO_CENTRE') {
                 this.isAutoCentring = true;
                 this.centrePrice = this.midPrice as Price;
                 this.needsFullRedraw = true;
-
-
-
             } else if (data.type === 'SET_TIME_SCALE') {
                 this.timeScale = data.payload;
                 this.resizeTrackerCanvas();
-
             } else if (data.type === 'SET_TIME_RANGE') {
                 this.timeRangeSeconds = data.payload;
                 this.resizeTrackerCanvas();
-
             } else if (data.type === 'RESIZE') {
                 this.handleResize(data.width, data.height, data.dpr);
-
             } else if (data.type === 'INIT_PORT') {
                 this.connectDataPort(data.port as MessagePort);
 
@@ -194,13 +182,10 @@ export class HeatmapRenderer {
             } else if (data.type === 'SET_MIN_VOLUME') {
                 this.minVolume = data.value as number;
                 logInfo('RENDER', `minVolume threshold set to ${this.minVolume.toFixed(2)}`);
-
             } else if (data.type === 'PIN_PRICE') {
                 this.pinnedPrice = data.price as number | null;
                 logInfo('RENDER', `Pinned price set to ${this.pinnedPrice}`);
-            }
-
-            else if (data.type === 'SET_BIN_SIZE') {
+            } else if (data.type === 'SET_BIN_SIZE') {
                 this.binSize = data.payload as number;
                 logInfo('RENDER', `Bin size set to ${this.binSize}`);
             }
@@ -213,17 +198,14 @@ export class HeatmapRenderer {
 
             if (portData.type === 'INITIALISE_SNAPSHOT') {
                 logInfo('RENDER', 'Initial Snapshot Seed received over port.');
-
             } else if (portData.type === 'CLEAR_HEATMAP') {
                 logInfo('RENDER', 'Clearing heatmap for symbol change.');
                 this.clear();
-
             } else if (portData.type === 'MID_PRICE_UPDATE') {
                 this.midPrice = portData.payload;
                 if (this.isAutoCentring) {
                     this.centrePrice = this.midPrice as Price;
                 }
-
             } else if (portData.type === 'RENDER_SLICE') {
                 const slice = portData.payload as HeatmapSlice;
                 this.binSize = portData.binSize; // grab bin size from data worker
@@ -237,7 +219,7 @@ export class HeatmapRenderer {
 
     private pushToHistory(slice: HeatmapSlice): void {
         const idx = this.historyWriteIdx;
-        
+
         // 1. Pack Metadata
         const mBase = idx * 5;
         this.metadataBuffer[mBase] = slice.timestamp;
@@ -249,7 +231,7 @@ export class HeatmapRenderer {
         // 2. Pack Bins
         const bBase = idx * this.MAX_BINS_PER_SLICE * 3;
         let bPtr = bBase;
-        
+
         const packBins = (bins: readonly any[]) => {
             const limit = Math.min(bins.length, this.MAX_BINS_PER_SLICE / 2);
             for (let i = 0; i < limit; i++) {
@@ -305,7 +287,7 @@ export class HeatmapRenderer {
         // Scratchpad of Float32 vectors for smooth R, G, B blending
         this.columnScratchpad = new Float32Array(this.height * 3);
         this.coverageScratchpad = new Float32Array(this.height);
-        
+
         this.needsFullRedraw = true;
     }
 
@@ -330,7 +312,14 @@ export class HeatmapRenderer {
      * Uses Sub-Pixel exact float coverage algorithms for blending fractional boundaries.
      */
     private drawSlice(slice: HeatmapSlice): void {
-        if (!this.trackerCtx || !this.columnImageData || !this.columnDataView || !this.columnScratchpad || !this.trackerCanvas) return;
+        if (
+            !this.trackerCtx ||
+            !this.columnImageData ||
+            !this.columnDataView ||
+            !this.columnScratchpad ||
+            !this.trackerCanvas
+        )
+            return;
 
         const shiftX = this.getShiftX();
 
@@ -351,7 +340,7 @@ export class HeatmapRenderer {
             const intShiftX = Math.ceil(shiftX);
             // Shift Tracker Canvas left by one column
             this.trackerCtx.drawImage(this.trackerCanvas, -intShiftX, 0);
-            
+
             const historyIdx = (this.historyWriteIdx - 1 + this.MAX_HISTORY) % this.MAX_HISTORY;
             const { volume, side } = this.drawHistorySliceAtX(historyIdx, this.width, intShiftX);
 
@@ -363,9 +352,12 @@ export class HeatmapRenderer {
                 if (prevMidPrice > 0) {
                     this.trackerCtx.beginPath();
                     this.trackerCtx.setLineDash([5, 5]);
-                    this.trackerCtx.moveTo(this.width - intShiftX + (intShiftX / 2), this.priceToY(prevMidPrice));
-                    this.trackerCtx.lineTo(this.width + (intShiftX / 2), this.priceToY(slice.midPrice));
-                    this.trackerCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)'; 
+                    this.trackerCtx.moveTo(
+                        this.width - intShiftX + intShiftX / 2,
+                        this.priceToY(prevMidPrice),
+                    );
+                    this.trackerCtx.lineTo(this.width + intShiftX / 2, this.priceToY(slice.midPrice));
+                    this.trackerCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
                     this.trackerCtx.lineWidth = Math.max(2, Math.floor(this.pixelRatio));
                     this.trackerCtx.lineCap = 'round';
                     this.trackerCtx.stroke();
@@ -387,7 +379,14 @@ export class HeatmapRenderer {
     }
 
     private redrawEntireBuffer(): void {
-        if (!this.trackerCtx || !this.columnImageData || !this.columnDataView || !this.columnScratchpad || !this.trackerCanvas) return;
+        if (
+            !this.trackerCtx ||
+            !this.columnImageData ||
+            !this.columnDataView ||
+            !this.columnScratchpad ||
+            !this.trackerCanvas
+        )
+            return;
 
         this.renderCentrePrice = this.centrePrice;
 
@@ -414,7 +413,7 @@ export class HeatmapRenderer {
                 lastPinnedVol = volume;
                 lastPinnedSide = side;
                 lastTimestamp = this.metadataBuffer[logicalIdx * 5];
-                
+
                 const tBase = logicalIdx * 10;
                 lastAskThresholds = Array.from(this.thresholdBuffer.subarray(tBase, tBase + 5));
                 lastBidThresholds = Array.from(this.thresholdBuffer.subarray(tBase + 5, tBase + 10));
@@ -429,14 +428,15 @@ export class HeatmapRenderer {
             this.trackerCtx.beginPath();
             this.trackerCtx.setLineDash([5, 5]);
             let hasStarted = false;
-            
+
             for (let i = 0; i < this.historyCount; i++) {
-                const logicalIdx = (this.historyWriteIdx - this.historyCount + i + this.MAX_HISTORY) % this.MAX_HISTORY;
+                const logicalIdx =
+                    (this.historyWriteIdx - this.historyCount + i + this.MAX_HISTORY) % this.MAX_HISTORY;
                 const midPrice = this.metadataBuffer[logicalIdx * 5 + 1];
                 if (midPrice === 0) continue;
 
-                const offsetFromEnd = (this.historyCount - 1 - i);
-                const sliceX = this.width - (offsetFromEnd * shiftX) + (shiftX / 2);
+                const offsetFromEnd = this.historyCount - 1 - i;
+                const sliceX = this.width - offsetFromEnd * shiftX + shiftX / 2;
                 const y = this.priceToY(midPrice);
 
                 if (!hasStarted) {
@@ -457,11 +457,22 @@ export class HeatmapRenderer {
         }
 
         this.needsFullRedraw = false;
-        this.reportViewportUpdate(lastTimestamp, lastPinnedVol, lastPinnedSide, lastAskThresholds, lastBidThresholds);
+        this.reportViewportUpdate(
+            lastTimestamp,
+            lastPinnedVol,
+            lastPinnedSide,
+            lastAskThresholds,
+            lastBidThresholds,
+        );
     }
 
-    private drawHistorySliceAtX(historyIdx: number, destinationX: number, shiftX: number): { volume: number | null, side: 'bid' | 'ask' | null } {
-        if (!this.trackerCtx || !this.columnScratchpad || !this.trackerCanvas) return { volume: null, side: null };
+    private drawHistorySliceAtX(
+        historyIdx: number,
+        destinationX: number,
+        shiftX: number,
+    ): { volume: number | null; side: 'bid' | 'ask' | null } {
+        if (!this.trackerCtx || !this.columnScratchpad || !this.trackerCanvas)
+            return { volume: null, side: null };
 
         const intShiftX = Math.ceil(shiftX);
         const intDestX = Math.round(destinationX);
@@ -475,13 +486,13 @@ export class HeatmapRenderer {
         const imgData = this.columnImageData!;
         this.columnScratchpad.fill(0);
         this.coverageScratchpad!.fill(0);
-        dataView.fill(0xFFFFFFFF);
+        dataView.fill(0xffffffff);
 
         const mBase = historyIdx * 5;
         const askCount = this.metadataBuffer[mBase + 2];
         const bidCount = this.metadataBuffer[mBase + 3];
         const historicalBinSize = this.metadataBuffer[mBase + 4];
-        
+
         const halfSpan = this.priceSpanVisible / 2;
         const effectiveCentre = this.renderCentrePrice || this.centrePrice;
         const pricesPerPixel = this.priceSpanVisible / this.height;
@@ -492,7 +503,12 @@ export class HeatmapRenderer {
 
         const bBase = historyIdx * this.MAX_BINS_PER_SLICE * 3;
 
-        const renderBinsFromBuffer = (startPtr: number, count: number, palette: PaletteName, side: 'bid' | 'ask') => {
+        const renderBinsFromBuffer = (
+            startPtr: number,
+            count: number,
+            palette: PaletteName,
+            side: 'bid' | 'ask',
+        ) => {
             for (let i = 0; i < count; i++) {
                 const ptr = startPtr + i * 3;
                 const lowerPriceBound = this.binBuffer[ptr];
@@ -526,7 +542,11 @@ export class HeatmapRenderer {
                     }
                 }
 
-                if (this.pinnedPrice !== null && this.pinnedPrice >= lowerPriceBound && this.pinnedPrice < lowerPriceBound + this.binSize) {
+                if (
+                    this.pinnedPrice !== null &&
+                    this.pinnedPrice >= lowerPriceBound &&
+                    this.pinnedPrice < lowerPriceBound + this.binSize
+                ) {
                     pinnedVolume = rawQuantity;
                     pinnedSide = side;
                 }
@@ -562,14 +582,14 @@ export class HeatmapRenderer {
     }
 
     private reportViewportUpdate(
-        timestamp: number, 
-        pinnedVolume: number | null, 
+        timestamp: number,
+        pinnedVolume: number | null,
         pinnedSide: 'bid' | 'ask' | null,
-        askVolumeThresholds?: readonly number[], 
-        bidVolumeThresholds?: readonly number[]
+        askVolumeThresholds?: readonly number[],
+        bidVolumeThresholds?: readonly number[],
     ): void {
         this.latestTimestamp = timestamp;
-        const latency = timestamp ? (Date.now() - timestamp) : 0;
+        const latency = timestamp ? Date.now() - timestamp : 0;
         const shiftX = this.getShiftX();
         const timeRangeMs = (this.width / shiftX) * 100;
 
@@ -586,8 +606,8 @@ export class HeatmapRenderer {
                 timeScale: this.timeScale,
                 timeRangeMs,
                 askVolumeThresholds,
-                bidVolumeThresholds
-            }
+                bidVolumeThresholds,
+            },
         });
     }
 
@@ -654,9 +674,9 @@ export class HeatmapRenderer {
      * for direct Uint32Array buffer manipulation.
      */
     private packRGB(rgb: readonly number[]): number {
-        const r = rgb[0] & 0xFF;
-        const g = rgb[1] & 0xFF;
-        const b = rgb[2] & 0xFF;
+        const r = rgb[0] & 0xff;
+        const g = rgb[1] & 0xff;
+        const b = rgb[2] & 0xff;
         // AAAAAAAA BBBBBBBB GGGGGGGG RRRRRRRR (Little Endian)
         return (255 << 24) | (b << 16) | (g << 8) | r;
     }

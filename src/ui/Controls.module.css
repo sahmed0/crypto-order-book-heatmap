@@ -100,7 +100,7 @@
     border-radius: 50%;
     background: white;
     border: 1px solid var(--accent);
-    box-shadow: 
+    box-shadow:
         0 2px 6px rgba(59, 130, 246, 0.2),
         inset 0 0 0 3px var(--accent);
     cursor: pointer;
@@ -109,7 +109,7 @@
 
 .slider::-webkit-slider-thumb:hover {
     transform: scale(1.15);
-    box-shadow: 
+    box-shadow:
         0 4px 12px rgba(59, 130, 246, 0.3),
         inset 0 0 0 2px var(--accent);
 }
@@ -199,7 +199,6 @@
 }
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;

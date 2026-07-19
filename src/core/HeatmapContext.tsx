@@ -11,11 +11,7 @@ import type { HeatmapService } from './HeatmapService';
 const HeatmapContext = createContext<HeatmapService>();
 
 export function HeatmapProvider(props: { service: HeatmapService; children: JSX.Element }) {
-    return (
-        <HeatmapContext.Provider value={props.service}>
-            {props.children}
-        </HeatmapContext.Provider>
-    );
+    return <HeatmapContext.Provider value={props.service}>{props.children}</HeatmapContext.Provider>;
 }
 
 /**

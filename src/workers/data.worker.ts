@@ -4,11 +4,11 @@ import { createOrderBookSide, updateOrderBookSide, pruneOrderBookSide } from '..
 import { logInfo } from '../engine/debug';
 
 interface BinanceDepthEvent {
-    e: string;      // Event type
-    E: number;      // Event time
-    s: string;      // Symbol
-    U: number;      // First update ID in event
-    u: number;      // Final update ID in event
+    e: string; // Event type
+    E: number; // Event time
+    s: string; // Symbol
+    U: number; // First update ID in event
+    u: number; // Final update ID in event
     b: [string, string][]; // Bids to be updated
     a: [string, string][]; // Asks to be updated
 }
@@ -66,7 +66,7 @@ export class BinanceConnector {
     public setSymbol(newSymbol: string): void {
         this.symbol = newSymbol;
         this.reconnectAttempt = 0;
-        
+
         // Stop current connection
         if (this.ws) {
             this.ws.close();
@@ -77,15 +77,15 @@ export class BinanceConnector {
             clearInterval(this.throttleIntervalId);
             this.throttleIntervalId = null;
         }
-        
+
         if (this.keepAliveIntervalId !== null) {
             clearInterval(this.keepAliveIntervalId);
             this.keepAliveIntervalId = null;
         }
-        
+
         // Notify render pipeline to clear visual history
         emit({ type: 'CLEAR_HEATMAP' });
-        
+
         // Re-initialise for new pair
         this.startSync();
     }
@@ -117,11 +117,15 @@ export class BinanceConnector {
         if (this.keepAliveIntervalId !== null) {
             clearInterval(this.keepAliveIntervalId);
         }
-        this.keepAliveIntervalId = setInterval(() => {
-            if (this.connectionId !== connectionId || !this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-            this.ws.send(JSON.stringify({ method: "LIST_SUBSCRIPTIONS", id: 999 }));
-            logInfo('DATA', '[WS_KEEPALIVE] Sent application-level keep-alive.');
-        }, 3 * 60 * 1000); // 3 minutes
+        this.keepAliveIntervalId = setInterval(
+            () => {
+                if (this.connectionId !== connectionId || !this.ws || this.ws.readyState !== WebSocket.OPEN)
+                    return;
+                this.ws.send(JSON.stringify({ method: 'LIST_SUBSCRIPTIONS', id: 999 }));
+                logInfo('DATA', '[WS_KEEPALIVE] Sent application-level keep-alive.');
+            },
+            3 * 60 * 1000,
+        ); // 3 minutes
     }
 
     private connectStream(connectionId: number): void {
@@ -176,10 +180,12 @@ export class BinanceConnector {
 
     private async fetchSnapshot(connectionId: number): Promise<void> {
         try {
-            const response = await fetch(`https://api.binance.com/api/v3/depth?symbol=${this.symbol.toUpperCase()}&limit=5000`);
+            const response = await fetch(
+                `https://api.binance.com/api/v3/depth?symbol=${this.symbol.toUpperCase()}&limit=5000`,
+            );
             if (!response.ok) throw new Error('Failed to fetch REST snapshot.');
 
-            const snapshot = await response.json() as BinanceSnapshot;
+            const snapshot = (await response.json()) as BinanceSnapshot;
             if (this.connectionId !== connectionId) return;
 
             this.lastUpdateId = snapshot.lastUpdateId;
@@ -192,13 +198,12 @@ export class BinanceConnector {
                 payload: {
                     // Send arrays of tuples for backward compatibility with the RenderWorker for now
                     asks: this.asks.prices.map((p, i) => [p, this.asks.quantities[i]]),
-                    bids: this.bids.prices.map((p, i) => [p, this.bids.quantities[i]])
-                }
+                    bids: this.bids.prices.map((p, i) => [p, this.bids.quantities[i]]),
+                },
             };
             emit(initMessage);
 
             this.processBuffer(connectionId);
-
         } catch (error) {
             if (this.connectionId === connectionId) {
                 const message = error instanceof Error ? error.message : 'Unknown snapshot fetch exception';
@@ -229,7 +234,9 @@ export class BinanceConnector {
                 this.applyEvent(event);
                 this.hasAppliedFirstEvent = true;
             } else {
-                this.emitError(`Sequence gap detected in first event. Expected U <= ${this.lastUpdateId + 1} and u >= ${this.lastUpdateId + 1}. Got U: ${event.U}, u: ${event.u}`);
+                this.emitError(
+                    `Sequence gap detected in first event. Expected U <= ${this.lastUpdateId + 1} and u >= ${this.lastUpdateId + 1}. Got U: ${event.U}, u: ${event.u}`,
+                );
                 this.handleRestart();
                 return;
             }
@@ -240,7 +247,9 @@ export class BinanceConnector {
             if (event.U === this.lastUpdateId + 1) {
                 this.applyEvent(event);
             } else {
-                this.emitError(`Sequence gap detected. Expected U: ${this.lastUpdateId + 1}, got: ${event.U}`);
+                this.emitError(
+                    `Sequence gap detected. Expected U: ${this.lastUpdateId + 1}, got: ${event.U}`,
+                );
                 this.handleRestart();
                 return;
             }
@@ -273,7 +282,7 @@ export class BinanceConnector {
         side: OrderBookSide,
         pending: Map<number, number>,
         updates: [string, string][],
-        isAscending: boolean
+        isAscending: boolean,
     ): void {
         for (const [pStr, qStr] of updates) {
             const price = parseFloat(pStr);
@@ -321,8 +330,8 @@ export class BinanceConnector {
                     payload: {
                         asks: Array.from(this.pendingAsks.entries()),
                         bids: Array.from(this.pendingBids.entries()),
-                        updateSequenceId: this.lastUpdateId
-                    }
+                        updateSequenceId: this.lastUpdateId,
+                    },
                 };
                 emit(depthUpdate);
 
@@ -344,10 +353,9 @@ export class BinanceConnector {
                 this.currentBinSize,
                 effectiveTimestamp,
                 currentMidPrice,
-                this.currentDepth
+                this.currentDepth,
             );
             emit({ type: 'RENDER_SLICE', payload: slice, binSize: this.currentBinSize });
-
         }, 100);
     }
 
@@ -381,7 +389,10 @@ export class BinanceConnector {
         }
         this.reconnectAttempt++;
 
-        logInfo('DATA', `[WS_RECONNECTING] Reconnecting in ${backoffMs}ms... (Attempt ${this.reconnectAttempt})`);
+        logInfo(
+            'DATA',
+            `[WS_RECONNECTING] Reconnecting in ${backoffMs}ms... (Attempt ${this.reconnectAttempt})`,
+        );
 
         setTimeout(() => {
             this.startSync();
@@ -409,12 +420,13 @@ const originalPost: (message: unknown) => void = globalThis.postMessage.bind(glo
  * Replaces the previous self.postMessage monkey-patch.
  */
 function emit(message: WorkerMessage): void {
-    if (renderPort && (
-        message.type === 'INITIALISE_SNAPSHOT' ||
-        message.type === 'DEPTH_UPDATE' ||
-        message.type === 'RENDER_SLICE' ||
-        message.type === 'MID_PRICE_UPDATE'
-    )) {
+    if (
+        renderPort &&
+        (message.type === 'INITIALISE_SNAPSHOT' ||
+            message.type === 'DEPTH_UPDATE' ||
+            message.type === 'RENDER_SLICE' ||
+            message.type === 'MID_PRICE_UPDATE')
+    ) {
         renderPort.postMessage(message);
     } else {
         originalPost(message);
@@ -434,8 +446,8 @@ const startProbe = () => {
                 wsState: (connector as any)?.ws?.readyState ?? WebSocket.CLOSED,
                 asksSize: (connector as any)?.asks?.prices?.length ?? 0,
                 bidsSize: (connector as any)?.bids?.prices?.length ?? 0,
-                isSyncing: (connector as any)?.isSyncing ?? false
-            }
+                isSyncing: (connector as any)?.isSyncing ?? false,
+            },
         });
     }, 2000);
 };

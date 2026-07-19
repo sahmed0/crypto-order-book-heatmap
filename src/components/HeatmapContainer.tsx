@@ -22,9 +22,25 @@ export default function HeatmapContainer() {
 
     // ---- Worker Pipeline State (Custom Hook) ------------------------------
     const {
-        service, wsState, asksSize, bidsSize, isSyncing, canvasRes, fps,
-        centrePrice, midPrice, priceSpan, pinnedVolume, pinnedSide, setPinnedVolume, canvasHeightCss, latency,
-        latestTimestamp, timeRangeMs, askVolumeThresholds, bidVolumeThresholds
+        service,
+        wsState,
+        asksSize,
+        bidsSize,
+        isSyncing,
+        canvasRes,
+        fps,
+        centrePrice,
+        midPrice,
+        priceSpan,
+        pinnedVolume,
+        pinnedSide,
+        setPinnedVolume,
+        canvasHeightCss,
+        latency,
+        latestTimestamp,
+        timeRangeMs,
+        askVolumeThresholds,
+        bidVolumeThresholds,
     } = useHeatmapPipeline(() => canvasRef);
 
     // ---- State --------------------------------------------------
@@ -58,11 +74,11 @@ export default function HeatmapContainer() {
         const onWheel = (e: WheelEvent) => {
             e.preventDefault();
             if (e.shiftKey) return onTimeWheel(e);
-            
+
             if (e.ctrlKey) {
                 const rect = canvasRef.getBoundingClientRect();
                 const cursorY = e.clientY - rect.top;
-                const ratioY = 0.5 - (cursorY / rect.height);
+                const ratioY = 0.5 - cursorY / rect.height;
                 const zoomSensitivity = 0.005;
                 const zoomFactor = Math.exp(e.deltaY * zoomSensitivity);
                 const oldSpan = priceSpan();
@@ -72,19 +88,14 @@ export default function HeatmapContainer() {
                 setIsAutoCentring(false);
                 heatmapService.sendZoom(newSpan);
                 heatmapService.sendPan(newCentre);
-                } else {
+            } else {
                 const canvasHeight = canvasRef.getBoundingClientRect().height;
                 const priceDelta = (e.deltaY / canvasHeight) * priceSpan();
                 const newCentre = centrePrice() - priceDelta;
                 setIsAutoCentring(false);
                 heatmapService.sendPan(newCentre);
-                }
-                };
-
-
-
-
-
+            }
+        };
 
         const onPointerDown = (e: PointerEvent) => {
             if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -127,7 +138,7 @@ export default function HeatmapContainer() {
                     let newSpan = oldSpan * zoomFactor;
                     newSpan = Math.max(MIN_PRICE_SPAN, Math.min(MAX_PRICE_SPAN, newSpan));
                     const cursorY = centreY - rect.top;
-                    const ratioY = 0.5 - (cursorY / rect.height);
+                    const ratioY = 0.5 - cursorY / rect.height;
                     const deltaY = centreY - lastPinchCentreY;
                     const priceDelta = (deltaY / rect.height) * oldSpan;
                     const newCentre = centrePrice() + ratioY * (oldSpan - newSpan) + priceDelta;
@@ -178,7 +189,7 @@ export default function HeatmapContainer() {
         canvasRef.addEventListener('pointerup', onPointerUp);
         canvasRef.addEventListener('pointercancel', onPointerCancel);
         canvasRef.addEventListener('contextmenu', onCanvasContextMenu);
-        
+
         priceAxisRef.addEventListener('wheel', onWheel, { passive: false });
         priceAxisRef.addEventListener('pointerdown', onPointerDown);
         priceAxisRef.addEventListener('pointermove', onPointerMove);
@@ -195,7 +206,7 @@ export default function HeatmapContainer() {
             canvasRef.removeEventListener('pointerup', onPointerUp);
             canvasRef.removeEventListener('pointercancel', onPointerCancel);
             canvasRef.removeEventListener('contextmenu', onCanvasContextMenu);
-            
+
             priceAxisRef?.removeEventListener('wheel', onWheel);
             priceAxisRef?.removeEventListener('pointerdown', onPointerDown);
             priceAxisRef?.removeEventListener('pointermove', onPointerMove);
@@ -222,23 +233,40 @@ export default function HeatmapContainer() {
     return (
         <div class={styles.container}>
             {/* Sidebar toggle button (mobile only) */}
-            <button class={styles.toggleButton} onClick={() => setIsSidebarOpen(true)} aria-label="Toggle Settings">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
+            <button
+                class={styles.toggleButton}
+                onClick={() => setIsSidebarOpen(true)}
+                aria-label="Toggle Settings"
+            >
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
                 </svg>
             </button>
 
             {/* Sidebar overlay (mobile only) */}
-            <div 
+            <div
                 class={`${styles.sidebarOverlay} ${isSidebarOpen() ? styles.open : ''}`}
                 onClick={() => setIsSidebarOpen(false)}
             />
 
             {/* ---- Left Sidebar: Controls, Pinned Info, Dashboard ---- */}
             <div class={`${styles.sidebar} ${isSidebarOpen() ? styles.open : ''}`}>
-                <button class={styles.closeButton} onClick={() => setIsSidebarOpen(false)} aria-label="Close Settings">
+                <button
+                    class={styles.closeButton}
+                    onClick={() => setIsSidebarOpen(false)}
+                    aria-label="Close Settings"
+                >
                     ✕
                 </button>
                 {/* Ensure each child has width 100% or matches the container */}
@@ -258,8 +286,24 @@ export default function HeatmapContainer() {
 
                 {/* ---- Pinned Price & Volume Bento Section ---- */}
                 <div class={styles.bentoBox}>
-                    <div style={{ display: 'flex', 'justify-content': 'space-between', 'align-items': 'center', 'margin-bottom': '6px' }}>
-                        <div style={{ 'font-weight': '800', color: '#3b82f6', 'font-size': '10px', 'letter-spacing': '0.12em', 'text-transform': 'uppercase', opacity: '0.8' }}>
+                    <div
+                        style={{
+                            display: 'flex',
+                            'justify-content': 'space-between',
+                            'align-items': 'center',
+                            'margin-bottom': '6px',
+                        }}
+                    >
+                        <div
+                            style={{
+                                'font-weight': '800',
+                                color: '#3b82f6',
+                                'font-size': '10px',
+                                'letter-spacing': '0.12em',
+                                'text-transform': 'uppercase',
+                                opacity: '0.8',
+                            }}
+                        >
                             PINNED LIQUIDITY
                         </div>
                         <Show when={pinnedPrice() !== null}>
@@ -297,52 +341,103 @@ export default function HeatmapContainer() {
                     <Show
                         when={pinnedPrice() !== null}
                         fallback={
-                            <p style={{
-                                'font-size': '12px',
-                                color: '#64748b',
-                                'line-height': '1.6',
-                                'margin': '0',
-                                'font-weight': '500',
-                            }}>
-                                <span style={{ color: '#3b82f6', 'font-weight': '700' }}>Click</span> the chart to pin a price level.<br />
-                                <span style={{ color: '#3b82f6', 'font-weight': '700' }}>Right-click</span> to unpin.
+                            <p
+                                style={{
+                                    'font-size': '12px',
+                                    color: '#64748b',
+                                    'line-height': '1.6',
+                                    margin: '0',
+                                    'font-weight': '500',
+                                }}
+                            >
+                                <span style={{ color: '#3b82f6', 'font-weight': '700' }}>Click</span> the
+                                chart to pin a price level.
+                                <br />
+                                <span style={{ color: '#3b82f6', 'font-weight': '700' }}>Right-click</span> to
+                                unpin.
                             </p>
                         }
                     >
-                        <div style={{ display: 'flex', 'justify-content': 'space-between', 'align-items': 'baseline', 'margin-top': '4px' }}>
-                            <span style={{ 'font-size': '24px', 'font-weight': '800', color: '#1e293b', 'letter-spacing': '-0.02em' }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                'justify-content': 'space-between',
+                                'align-items': 'baseline',
+                                'margin-top': '4px',
+                            }}
+                        >
+                            <span
+                                style={{
+                                    'font-size': '24px',
+                                    'font-weight': '800',
+                                    color: '#1e293b',
+                                    'letter-spacing': '-0.02em',
+                                }}
+                            >
                                 ${pinnedPrice()?.toLocaleString()}
                             </span>
                             <span style={{ 'font-size': '11px', 'font-weight': '700', color: '#94a3b8' }}>
                                 USD
                             </span>
                         </div>
-                        <div style={{
-                            'margin-top': '12px',
-                            padding: '14px',
-                            background: pinnedSide() === 'ask' ? 'rgba(239, 68, 68, 0.06)' : pinnedSide() === 'bid' ? 'rgba(34, 197, 94, 0.06)' : 'rgba(59, 130, 246, 0.06)',
-                            'border-radius': '16px',
-                            display: 'flex',
-                            'flex-direction': 'column',
-                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                        }}>
-                            <div style={{
-                                'font-size': '10px',
-                                'color': pinnedSide() === 'ask' ? '#ef4444' : pinnedSide() === 'bid' ? '#22c55e' : '#64748b',
-                                'font-weight': '700',
-                                'letter-spacing': '0.05em',
-                                'margin-bottom': '2px'
-                            }}>
-                                {pinnedSide() === 'ask' ? 'SELL LIQUIDITY' : pinnedSide() === 'bid' ? 'BUY LIQUIDITY' : 'LIQUIDITY'}
+                        <div
+                            style={{
+                                'margin-top': '12px',
+                                padding: '14px',
+                                background:
+                                    pinnedSide() === 'ask'
+                                        ? 'rgba(239, 68, 68, 0.06)'
+                                        : pinnedSide() === 'bid'
+                                          ? 'rgba(34, 197, 94, 0.06)'
+                                          : 'rgba(59, 130, 246, 0.06)',
+                                'border-radius': '16px',
+                                display: 'flex',
+                                'flex-direction': 'column',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                            }}
+                        >
+                            <div
+                                style={{
+                                    'font-size': '10px',
+                                    color:
+                                        pinnedSide() === 'ask'
+                                            ? '#ef4444'
+                                            : pinnedSide() === 'bid'
+                                              ? '#22c55e'
+                                              : '#64748b',
+                                    'font-weight': '700',
+                                    'letter-spacing': '0.05em',
+                                    'margin-bottom': '2px',
+                                }}
+                            >
+                                {pinnedSide() === 'ask'
+                                    ? 'SELL LIQUIDITY'
+                                    : pinnedSide() === 'bid'
+                                      ? 'BUY LIQUIDITY'
+                                      : 'LIQUIDITY'}
                             </div>
-                            <div style={{
-                                'font-size': '18px',
-                                'font-weight': '800',
-                                color: pinnedSide() === 'ask' ? '#ef4444' : pinnedSide() === 'bid' ? '#22c55e' : '#3b82f6',
-                                'font-family': 'monospace'
-                            }}>
-                                {pinnedVolume() === null ? 'loading\u2026' : pinnedVolume()?.toLocaleString('en-GB', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}
-                                <span style={{ 'font-size': '12px', 'margin-left': '6px', opacity: 0.7 }}>{activeSymbol().replace('USDT', '')}</span>
+                            <div
+                                style={{
+                                    'font-size': '18px',
+                                    'font-weight': '800',
+                                    color:
+                                        pinnedSide() === 'ask'
+                                            ? '#ef4444'
+                                            : pinnedSide() === 'bid'
+                                              ? '#22c55e'
+                                              : '#3b82f6',
+                                    'font-family': 'monospace',
+                                }}
+                            >
+                                {pinnedVolume() === null
+                                    ? 'loading\u2026'
+                                    : pinnedVolume()?.toLocaleString('en-GB', {
+                                          minimumFractionDigits: 4,
+                                          maximumFractionDigits: 4,
+                                      })}
+                                <span style={{ 'font-size': '12px', 'margin-left': '6px', opacity: 0.7 }}>
+                                    {activeSymbol().replace('USDT', '')}
+                                </span>
                             </div>
                         </div>
                     </Show>
@@ -401,10 +496,7 @@ export default function HeatmapContainer() {
                 </div>
 
                 <div ref={timeAxisRef!} class={styles.timeAxisContainer}>
-                    <TimeAxis
-                        latestTimestamp={latestTimestamp}
-                        timeRangeMs={timeRangeMs}
-                    />
+                    <TimeAxis latestTimestamp={latestTimestamp} timeRangeMs={timeRangeMs} />
                 </div>
             </div>
         </div>

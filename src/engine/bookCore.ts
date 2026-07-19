@@ -12,7 +12,7 @@ import type { OrderBookSide } from './types';
 export function createOrderBookSide(): OrderBookSide {
     return {
         prices: [],
-        quantities: []
+        quantities: [],
     };
 }
 
@@ -53,7 +53,7 @@ export function binarySearch(prices: readonly number[], targetPrice: number, isA
     // Return the bitwise complement of the insertion point.
     // This allows the caller to know exactly where to insert the new element
     // to maintain the sorted order.
-    return ~(low);
+    return ~low;
 }
 
 /**
@@ -67,7 +67,12 @@ export function binarySearch(prices: readonly number[], targetPrice: number, isA
  * @param quantity The new quantity.
  * @param isAscending True if asks (lowest first), false if bids (highest first).
  */
-export function updateOrderBookSide(side: OrderBookSide, price: number, quantity: number, isAscending: boolean): void {
+export function updateOrderBookSide(
+    side: OrderBookSide,
+    price: number,
+    quantity: number,
+    isAscending: boolean,
+): void {
     const prices = side.prices;
     const quantities = side.quantities;
 

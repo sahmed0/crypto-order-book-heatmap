@@ -54,11 +54,21 @@ export class HeatmapProcessor {
         binSize: number,
         timestamp: Timestamp,
         midPrice: number,
-        depth: number = 5000
+        depth: number = 5000,
     ): HeatmapSlice {
         this.calculateBins(book, binSize, depth);
-        const askData = this.normaliseVolumeByRank(this.askBinBuffer, this.askActiveIndices, this.askActiveCount, binSize);
-        const bidData = this.normaliseVolumeByRank(this.bidBinBuffer, this.bidActiveIndices, this.bidActiveCount, binSize);
+        const askData = this.normaliseVolumeByRank(
+            this.askBinBuffer,
+            this.askActiveIndices,
+            this.askActiveCount,
+            binSize,
+        );
+        const bidData = this.normaliseVolumeByRank(
+            this.bidBinBuffer,
+            this.bidActiveIndices,
+            this.bidActiveCount,
+            binSize,
+        );
         this.resetBuffers();
 
         return {
@@ -67,7 +77,7 @@ export class HeatmapProcessor {
             askBins: askData.bins,
             bidBins: bidData.bins,
             askVolumeThresholds: askData.thresholds,
-            bidVolumeThresholds: bidData.thresholds
+            bidVolumeThresholds: bidData.thresholds,
         };
     }
 
@@ -136,8 +146,8 @@ export class HeatmapProcessor {
         buffer: Float64Array,
         activeIndices: Int32Array,
         activeCount: number,
-        binSize: number
-    ): { bins: HeatmapBin[], thresholds: number[] } {
+        binSize: number,
+    ): { bins: HeatmapBin[]; thresholds: number[] } {
         if (activeCount === 0) return { bins: [], thresholds: [0, 0, 0, 0, 0] };
 
         // 1. Sort a view of the active indices by their quantity in the buffer
@@ -158,7 +168,7 @@ export class HeatmapProcessor {
             // Discrete Quantisation: "Snaps" to 5 discrete levels for a Weather Radar effect
             const level = Math.ceil(baseIntensity * 5);
             const intensity = (level / 5) as Quantity;
-            
+
             // Capture the minimum volume for each level
             while (currentLevel <= level && currentLevel <= 5) {
                 thresholds[currentLevel - 1] = qty;
@@ -171,7 +181,7 @@ export class HeatmapProcessor {
                 lowerPriceBound: lowerBound,
                 upperPriceBound: (lowerBound + binSize) as Price,
                 aggregatedQuantity: intensity,
-                rawQuantity: qty as Quantity
+                rawQuantity: qty as Quantity,
             };
         }
 

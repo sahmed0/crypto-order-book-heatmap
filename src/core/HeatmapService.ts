@@ -34,35 +34,44 @@ export class HeatmapService {
     }
 
     /** Sets the minimum normalised volume threshold (0 – 1). Debounced at 100ms. */
-    public sendMinVolume = this.debounce((value: number) => 
-        this.sendToRender({ type: 'SET_MIN_VOLUME', value }), 100);
+    public sendMinVolume = this.debounce(
+        (value: number) => this.sendToRender({ type: 'SET_MIN_VOLUME', value }),
+        100,
+    );
 
     /** Pins a price level on the heatmap. Debounced at 100ms. */
-    public sendPinnedPrice = this.debounce((price: number | null) => 
-        this.sendToRender({ type: 'PIN_PRICE', price }), 100);
+    public sendPinnedPrice = this.debounce(
+        (price: number | null) => this.sendToRender({ type: 'PIN_PRICE', price }),
+        100,
+    );
 
     /** Updates the visible price span (zoom). Throttled via rAF. */
-    public sendZoom = this.throttleRaf((priceSpan: number) => 
-        this.sendToRender({ type: 'SET_ZOOM', payload: priceSpan }));
+    public sendZoom = this.throttleRaf((priceSpan: number) =>
+        this.sendToRender({ type: 'SET_ZOOM', payload: priceSpan }),
+    );
 
     /** Updates the centre price (panning). Throttled via rAF. */
-    public sendPan = this.throttleRaf((centrePrice: number) => 
-        this.sendToRender({ type: 'SET_PAN', payload: centrePrice as any }));
+    public sendPan = this.throttleRaf((centrePrice: number) =>
+        this.sendToRender({ type: 'SET_PAN', payload: centrePrice as any }),
+    );
 
     /** Re-enables auto-centring on the live mid-price. */
     public sendAutoCentre = () => this.sendToRender({ type: 'SET_AUTO_CENTRE' });
 
     /** Adjusts the horizontal scrolling speed (time scale). Debounced at 100ms. */
-    public sendTimeScale = this.debounce((scale: number) => 
-        this.sendToRender({ type: 'SET_TIME_SCALE', payload: scale }), 100);
+    public sendTimeScale = this.debounce(
+        (scale: number) => this.sendToRender({ type: 'SET_TIME_SCALE', payload: scale }),
+        100,
+    );
 
     /** Sets the total time range visible (in seconds). Debounced at 100ms. */
-    public sendTimeRange = this.debounce((seconds: number) => 
-        this.sendToRender({ type: 'SET_TIME_RANGE', payload: seconds }), 100);
+    public sendTimeRange = this.debounce(
+        (seconds: number) => this.sendToRender({ type: 'SET_TIME_RANGE', payload: seconds }),
+        100,
+    );
 
     /** Sets the depth of the order book to process. Debounced at 100ms. */
-    public sendDepth = this.debounce((depth: number) => 
-        this.sendToData({ type: 'SET_DEPTH', depth }), 100);
+    public sendDepth = this.debounce((depth: number) => this.sendToData({ type: 'SET_DEPTH', depth }), 100);
 
     /** Sets the aggregation bin size. Debounced at 100ms. */
     public sendBinSize = this.debounce((size: number) => {

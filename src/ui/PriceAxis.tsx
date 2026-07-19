@@ -49,10 +49,13 @@ export default function PriceAxis(props: PriceAxisProps) {
             // Fix floating point representation issues like 0.05000000000000001
             const cleanP = parseFloat(p.toPrecision(12));
             const y = priceToCssY(cleanP, height, centre, span);
-            result.push({ 
-                price: cleanP, 
-                label: cleanP.toLocaleString('en-GB', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }),
-                y 
+            result.push({
+                price: cleanP,
+                label: cleanP.toLocaleString('en-GB', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals,
+                }),
+                y,
             });
         }
 
@@ -77,43 +80,51 @@ export default function PriceAxis(props: PriceAxisProps) {
     });
 
     return (
-        <div style={{
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            'pointer-events': 'none',
-            'font-family': "'Inter', system-ui, sans-serif",
-            'font-size': '10px',
-            'font-weight': '600',
-            color: '#64748b',
-            'user-select': 'none',
-        }}>
+        <div
+            style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                'pointer-events': 'none',
+                'font-family': "'Inter', system-ui, sans-serif",
+                'font-size': '10px',
+                'font-weight': '600',
+                color: '#64748b',
+                'user-select': 'none',
+            }}
+        >
             <For each={ticks()}>
                 {(tick) => (
-                    <div style={{
-                        position: 'absolute',
-                        top: `${tick.y}px`,
-                        left: '0',
-                        width: '100%',
-                    }}>
-                        <div style={{
+                    <div
+                        style={{
                             position: 'absolute',
-                            top: '0',
+                            top: `${tick.y}px`,
                             left: '0',
-                            width: '6px',
-                            height: '1px',
-                            background: 'rgba(59, 130, 246, 0.2)',
-                        }} />
-                        <div style={{
-                            position: 'absolute',
-                            top: '0',
-                            left: '10px',
-                            transform: 'translateY(-50%)',
-                            'white-space': 'nowrap',
-                            opacity: 0.8,
-                        }}>
+                            width: '100%',
+                        }}
+                    >
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '0',
+                                left: '0',
+                                width: '6px',
+                                height: '1px',
+                                background: 'rgba(59, 130, 246, 0.2)',
+                            }}
+                        />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '0',
+                                left: '10px',
+                                transform: 'translateY(-50%)',
+                                'white-space': 'nowrap',
+                                opacity: 0.8,
+                            }}
+                        >
                             ${tick.label}
                         </div>
                     </div>
@@ -121,39 +132,49 @@ export default function PriceAxis(props: PriceAxisProps) {
             </For>
 
             <Show when={midPriceY() !== null}>
-                <div style={{
-                    position: 'absolute',
-                    top: `${midPriceY()}px`,
-                    left: '0',
-                    width: '100%',
-                    'z-index': 10,
-                }}>
-                    <div style={{
+                <div
+                    style={{
                         position: 'absolute',
-                        top: '0',
-                        left: '20px',
-                        width: '10px',
-                        height: '2px',
-                        background: '#FF00FF',
-                        'border-radius': '1px',
-                        'box-shadow': '0 0 8px rgba(59, 130, 246, 0.4)',
-                    }} />
-                    <div style={{
-                        position: 'absolute',
-                        top: '0',
-                        left: '60%',
-                        transform: 'translateY(-50%)',
-                        'white-space': 'nowrap',
-                        background: '#FF00FF',
-                        color: '#ffffff',
-                        padding: '3px 6px',
-                        'border-radius': '6px',
-                        'font-weight': '800',
-                        'font-size': '10px',
-                        'margin-left': '6px',
-                        'box-shadow': '0 4px 12px rgba(59, 130, 246, 0.2)',
-                    }}>
-                        ${props.midPrice().toLocaleString(undefined, { minimumFractionDigits: midPriceDecimals(), maximumFractionDigits: midPriceDecimals() })}
+                        top: `${midPriceY()}px`,
+                        left: '0',
+                        width: '100%',
+                        'z-index': 10,
+                    }}
+                >
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '0',
+                            left: '20px',
+                            width: '10px',
+                            height: '2px',
+                            background: '#FF00FF',
+                            'border-radius': '1px',
+                            'box-shadow': '0 0 8px rgba(59, 130, 246, 0.4)',
+                        }}
+                    />
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '0',
+                            left: '60%',
+                            transform: 'translateY(-50%)',
+                            'white-space': 'nowrap',
+                            background: '#FF00FF',
+                            color: '#ffffff',
+                            padding: '3px 6px',
+                            'border-radius': '6px',
+                            'font-weight': '800',
+                            'font-size': '10px',
+                            'margin-left': '6px',
+                            'box-shadow': '0 4px 12px rgba(59, 130, 246, 0.2)',
+                        }}
+                    >
+                        $
+                        {props.midPrice().toLocaleString(undefined, {
+                            minimumFractionDigits: midPriceDecimals(),
+                            maximumFractionDigits: midPriceDecimals(),
+                        })}
                     </div>
                 </div>
             </Show>

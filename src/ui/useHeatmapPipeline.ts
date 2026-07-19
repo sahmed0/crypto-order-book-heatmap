@@ -45,14 +45,12 @@ export function useHeatmapPipeline(canvasRefFn: () => HTMLCanvasElement | undefi
         if (!canvasRef) return;
 
         // Step 1 — Instantiate both workers.
-        const dataWorker = new Worker(
-            new URL('../workers/data.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
-        const renderWorker = new Worker(
-            new URL('../workers/render.worker.ts', import.meta.url),
-            { type: 'module' },
-        );
+        const dataWorker = new Worker(new URL('../workers/data.worker.ts', import.meta.url), {
+            type: 'module',
+        });
+        const renderWorker = new Worker(new URL('../workers/render.worker.ts', import.meta.url), {
+            type: 'module',
+        });
 
         // Step 2 — Create the service instance to manage communication.
         const heatmapService = new HeatmapService(renderWorker, dataWorker);
@@ -107,21 +105,14 @@ export function useHeatmapPipeline(canvasRefFn: () => HTMLCanvasElement | undefi
             }
         };
 
-
         // Step 4 — Transfer the canvas to the RenderWorker.
         const offscreen = canvasRef.transferControlToOffscreen();
         renderWorker.postMessage({ type: 'INIT_CANVAS', canvas: offscreen }, [offscreen]);
 
         // Step 5 — Wire a direct MessageChannel between the two workers.
         const pipelineChannel = new MessageChannel();
-        renderWorker.postMessage(
-            { type: 'INIT_PORT', port: pipelineChannel.port2 },
-            [pipelineChannel.port2],
-        );
-        dataWorker.postMessage(
-            { type: 'INIT_PORT', port: pipelineChannel.port1 },
-            [pipelineChannel.port1],
-        );
+        renderWorker.postMessage({ type: 'INIT_PORT', port: pipelineChannel.port2 }, [pipelineChannel.port2]);
+        dataWorker.postMessage({ type: 'INIT_PORT', port: pipelineChannel.port1 }, [pipelineChannel.port1]);
 
         // Step 6 — Start the data engine.
         dataWorker.postMessage({ type: 'START_STREAM' });

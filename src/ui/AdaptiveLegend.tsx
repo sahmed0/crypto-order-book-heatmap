@@ -52,7 +52,7 @@ interface LegendSectionProps {
 
 function LegendSection(props: LegendSectionProps) {
     const palette = PALETTE_BANDS[props.paletteName];
-    
+
     const displayPalette = () => {
         const p = [...palette];
         return props.reverse ? p : p.reverse();
@@ -65,18 +65,17 @@ function LegendSection(props: LegendSectionProps) {
 
     return (
         <div class={styles.section}>
-            <div class={styles.title}>
-                {props.title}
-            </div>
+            <div class={styles.title}>{props.title}</div>
 
             <div class={styles.list}>
                 <For each={displayPalette()}>
                     {(colour, i) => (
                         <div class={styles.item}>
-                            <div class={styles.colourBox} style={{ background: `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})` }} />
-                            <span class={styles.valueText}>
-                                {props.format(displayThresholds()[i()])}
-                            </span>
+                            <div
+                                class={styles.colourBox}
+                                style={{ background: `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})` }}
+                            />
+                            <span class={styles.valueText}>{props.format(displayThresholds()[i()])}</span>
                         </div>
                     )}
                 </For>

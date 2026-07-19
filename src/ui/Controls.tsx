@@ -67,23 +67,30 @@ export default function Controls(props: ControlsProps) {
     };
 
     return (
-        <aside class={styles.panel} style={{
-            position: 'relative',
-            top: 'auto',
-            right: 'auto',
-            bottom: 'auto',
-            left: 'auto',
-            'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
-        }}>
-            <div style={{
-                display: 'flex',
-                'justify-content': 'space-between',
-                'align-items': 'center',
-                'margin-bottom': '2px',
-                'padding-bottom': '10px',
-                'border-bottom': '1px solid var(--panel-border)',
-            }}>
-                <div class={styles.panelTitle} style={{ padding: 0, margin: 0, border: 'none' }}>Controls</div>
+        <aside
+            class={styles.panel}
+            style={{
+                position: 'relative',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto',
+                left: 'auto',
+                'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
+            }}
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    'justify-content': 'space-between',
+                    'align-items': 'center',
+                    'margin-bottom': '2px',
+                    'padding-bottom': '10px',
+                    'border-bottom': '1px solid var(--panel-border)',
+                }}
+            >
+                <div class={styles.panelTitle} style={{ padding: 0, margin: 0, border: 'none' }}>
+                    Controls
+                </div>
             </div>
 
             {/* ---- Symbol ---- */}
@@ -98,9 +105,7 @@ export default function Controls(props: ControlsProps) {
                     onChange={handleSymbolChange}
                     aria-label="Symbol"
                 >
-                    <For each={SUPPORTED_PAIRS}>
-                        {(s) => <option value={s}>{s}</option>}
-                    </For>
+                    <For each={SUPPORTED_PAIRS}>{(s) => <option value={s}>{s}</option>}</For>
                 </select>
             </div>
 
@@ -139,9 +144,9 @@ export default function Controls(props: ControlsProps) {
                     onChange={handleDepthChange}
                     aria-label="Order book depth"
                 >
-                    {DEPTH_OPTIONS.map(d => (
+                    <For each={DEPTH_OPTIONS}>{(d) => (
                         <option value={d}>{d}</option>
-                    ))}
+                    )}</For>
                 </select>
             </div>
 
@@ -157,9 +162,9 @@ export default function Controls(props: ControlsProps) {
                     onChange={handleBinSizeChange}
                     aria-label="Aggregation Bin Size"
                 >
-                    {BIN_SIZE_OPTIONS.map(s => (
+                    <For each={BIN_SIZE_OPTIONS}>{(s) => (
                         <option value={s}>${s}</option>
-                    ))}
+                    )}</For>
                 </select>
             </div>
 
@@ -177,9 +182,9 @@ export default function Controls(props: ControlsProps) {
                     onChange={handleTimeRangeChange}
                     aria-label="Time Range"
                 >
-                    {TIME_RANGE_OPTIONS.map(s => (
+                    <For each={TIME_RANGE_OPTIONS}>{(s) => (
                         <option value={s}>{s}s</option>
-                    ))}
+                    )}</For>
                 </select>
             </div>
 

@@ -43,7 +43,7 @@ export default function ProbeDashboard(props: ProbeDashboardProps) {
                 'border-left': '1px solid rgba(255, 255, 255, 0.7)',
                 'border-radius': '24px',
                 padding: '24px',
-                'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)', 
+                'box-shadow': '0 5px 5px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.2)',
                 'font-family': "'Inter', 'Segoe UI', system-ui, sans-serif",
                 'font-size': '11px',
                 color: '#1e293b',
@@ -53,13 +53,15 @@ export default function ProbeDashboard(props: ProbeDashboardProps) {
                 gap: '6px',
             }}
         >
-            <div style={{
-                display: 'flex',
-                'justify-content': 'space-between',
-                'align-items': 'center',
-                gap: '16px',
-                'margin-bottom': '4px'
-            }}>
+            <div
+                style={{
+                    display: 'flex',
+                    'justify-content': 'space-between',
+                    'align-items': 'center',
+                    gap: '16px',
+                    'margin-bottom': '4px',
+                }}
+            >
                 <div style={{ 'font-weight': '700', color: '#3b82f6', 'letter-spacing': '0.04em' }}>
                     PROBE DASHBOARD
                 </div>
@@ -76,7 +78,9 @@ export default function ProbeDashboard(props: ProbeDashboardProps) {
 
             <div>Total Depth: {props.asksSize + props.bidsSize} levels</div>
 
-            <hr style={{ border: 'none', 'border-top': '1px solid rgba(59,130,246,0.12)', margin: '5px 0' }} />
+            <hr
+                style={{ border: 'none', 'border-top': '1px solid rgba(59,130,246,0.12)', margin: '5px 0' }}
+            />
 
             <div>
                 API Response Latency:{' '}
@@ -86,10 +90,7 @@ export default function ProbeDashboard(props: ProbeDashboardProps) {
             </div>
 
             <div>
-                Rendering FPS:{' '}
-                <span style={{ color: fpsColour(), 'font-weight': '600' }}>
-                    {props.fps}
-                </span>
+                Rendering FPS: <span style={{ color: fpsColour(), 'font-weight': '600' }}>{props.fps}</span>
             </div>
         </div>
     );
