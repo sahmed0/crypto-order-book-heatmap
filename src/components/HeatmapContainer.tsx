@@ -50,7 +50,7 @@ export default function HeatmapContainer() {
             const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
             const zoomSensitivity = e.ctrlKey ? 0.005 : 0.001;
             const zoomFactor = Math.exp(delta * zoomSensitivity);
-            let newScale = Math.max(0.1, Math.min(10, timeScale() * zoomFactor));
+            const newScale = Math.max(0.1, Math.min(10, timeScale() * zoomFactor));
             setTimeScale(newScale);
             heatmapService.sendTimeScale(newScale);
         };
