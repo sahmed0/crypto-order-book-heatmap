@@ -171,15 +171,8 @@ Transferring large amounts of data between workers can be expensive. By using a 
 ---
 
 ## License
-![Copyright](https://img.shields.io/badge/Copyright-2026_Sajid_Ahmed-brightgreen.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)
 
-Copyright (c) 2026 Sajid Ahmed. **All Rights Reserved.**
+This project is licensed under the MIT Licence — Copyright (c) 2026 Sajid Ahmed.
 
-This repository is a **Proprietary Project**.
-
-While I am a strong supporter of Open Source Software, this specific codebase represents a significant personal investment of time and effort and is therefore provided with the following restrictions:
-
-* **Permitted:** Viewing, forking (within GitHub only), and local execution for evaluation and personal, non-commercial usage only.
-* **Prohibited:** Modification, redistribution, commercial use, and AI/LLM training.
-
-For the full legal terms, please see the [LICENSE](./LICENSE) file.
+See the [LICENSE](./LICENSE) file for the full text.
