@@ -81,24 +81,13 @@ export interface DepthDeltaPayload {
 }
 
 /**
- * Payload for a render frame command.
- */
-export interface RenderPayload {
-    /** Start timestamp of the frame window. */
-    readonly startTimestamp: Timestamp;
-    /** End timestamp of the frame window. */
-    readonly endTimestamp: Timestamp;
-}
-
-/**
  * Discriminated union for worker communications via postMessage.
  * Defines the standard message shapes for the pipeline.
  */
 export type WorkerMessage =
     | { readonly type: 'INITIALISE_SNAPSHOT'; readonly payload: SnapshotPayload }
     | { readonly type: 'DEPTH_UPDATE'; readonly payload: DepthDeltaPayload }
-    | { readonly type: 'RENDER_FRAME'; readonly payload: Readonly<RenderPayload> }
-    | { readonly type: 'RENDER_SLICE'; readonly payload: HeatmapSlice, binSize: number }
+    | { readonly type: 'RENDER_SLICE'; readonly payload: HeatmapSlice; binSize: number }
     | { readonly type: 'MID_PRICE_UPDATE'; readonly payload: number }
     | { readonly type: 'CLEAR_HEATMAP' }
     | { readonly type: 'ERROR'; readonly message: string };

@@ -234,8 +234,8 @@ export class BinanceConnector {
                 return;
             }
         } else {
-            // Note: The @100ms stream frequently does NOT include the 'pu' property.
-            // We must validate that the *first* update ID of this new event (U) 
+            // Note: The @depth stream frequently does NOT include the 'pu' property.
+            // We must validate that the *first* update ID of this new event (U)
             // is exactly equal to the *final* update ID of the previous event (u) + 1.
             if (event.U === this.lastUpdateId + 1) {
                 this.applyEvent(event);
@@ -374,7 +374,7 @@ export class BinanceConnector {
             this.keepAliveIntervalId = null;
         }
 
-        // Exponential backoff logic: start at 2000ms, cap at 30000ms
+        // Exponential backoff logic: start at 1000ms, cap at 30000ms
         let backoffMs = Math.pow(2, this.reconnectAttempt) * 1000;
         if (backoffMs > 30000) {
             backoffMs = 30000;

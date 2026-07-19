@@ -97,7 +97,8 @@ export function updateOrderBookSide(side: OrderBookSide, price: number, quantity
 
 /**
  * Prunes the order book side to the specified limit.
- * Since the arrays are always kept sorted, this is a simple O(1) truncation.
+ * Since the arrays are always kept sorted, this drops the worst prices by truncating
+ * `Array.length` — O(number of dropped elements), not O(1).
  *
  * @param side The order book side to prune.
  * @param limit The maximum number of levels to keep.

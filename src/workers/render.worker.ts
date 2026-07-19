@@ -44,7 +44,7 @@ export class HeatmapRenderer {
 
     // coverage buffer property
     private coverageScratchpad: Float32Array | null = null;
-    private renderCentrePrice: Price = 0 as Price; // We will use this for Issue 2
+    private renderCentrePrice: Price = 0 as Price;
 
     // Pre-allocated zero-allocation hot-path buffer
     private columnImageData: ImageData | null = null;
@@ -55,7 +55,6 @@ export class HeatmapRenderer {
 
     // Viewport tracking
     private centrePrice: Price = 0 as Price;
-    // private previousCentrePrice: Price = 0 as Price; // part of OLD WAY of Out-of-Bounds Clearance
     private priceSpanVisible: number = DEFAULT_PRICE_SPAN;
     private timeScale: number = 1;
     private timeRangeSeconds: number = 10;
@@ -78,7 +77,7 @@ export class HeatmapRenderer {
     private historyWriteIdx = 0;
     private historyCount = 0;
 
-    // Metadata: [timestamp, midPrice, askBinCount, bidBinCount] per slice
+    // Metadata: [timestamp, midPrice, askBinCount, bidBinCount, binSize] per slice
     private readonly metadataBuffer = new Float64Array(this.MAX_HISTORY * 5);
     
     // Bin Data: [lowerPrice, intensity, rawQty] triplets. 
@@ -134,7 +133,6 @@ export class HeatmapRenderer {
     public clear(): void {
         this.historyWriteIdx = 0;
         this.historyCount = 0;
-        // this.previousCentrePrice = 0 as Price; // part of OLD WAY of Out-of-Bounds Clearance
         this.needsFullRedraw = true;
         
         if (this.trackerCtx) {
@@ -336,7 +334,6 @@ export class HeatmapRenderer {
 
         const shiftX = this.getShiftX();
 
-        // NEW WAY - Decide if we can use the fast shift-path or need a full redraw
         if (!this.renderCentrePrice) this.renderCentrePrice = this.centrePrice;
 
         const pricesPerPixel = this.priceSpanVisible / this.height;
@@ -346,15 +343,6 @@ export class HeatmapRenderer {
         if (Math.abs(this.centrePrice - this.renderCentrePrice) > maxPixelDrift * pricesPerPixel) {
             this.needsFullRedraw = true;
         }
-
-        /* // OLD WAY - Out-of-Bounds Clearance — flush tracker if price jumps more than half the viewport
-        if (
-            this.previousCentrePrice !== 0 &&
-            Math.abs(this.centrePrice - this.previousCentrePrice) > this.priceSpanVisible / 2 &&
-            this.isAutoCentring
-        ) {
-            this.needsFullRedraw = true;
-        } */
 
         // 2. Decide if we can use the fast shift-path or need a full redraw
         if (this.needsFullRedraw) {
@@ -385,10 +373,14 @@ export class HeatmapRenderer {
                 }
             }
 
-            this.reportViewportUpdate(slice.timestamp, volume, side, slice.askVolumeThresholds, slice.bidVolumeThresholds);
+            this.reportViewportUpdate(
+                slice.timestamp,
+                volume,
+                side,
+                slice.askVolumeThresholds,
+                slice.bidVolumeThresholds,
+            );
         }
-
-        // this.previousCentrePrice = this.centrePrice; // part of OLD WAY Out-of-Bounds Clearance (see above)
 
         // Record timestamp for animation
         this.lastSliceTime = performance.now();
@@ -527,12 +519,6 @@ export class HeatmapRenderer {
                     if (coverage > 0) {
                         const idx = y * 3;
                         const scratch = this.columnScratchpad!;
-                        // Old way
-                        // scratch[idx] = scratch[idx] * (1 - coverage) + rgb[0] * coverage;
-                        // scratch[idx + 1] = scratch[idx + 1] * (1 - coverage) + rgb[1] * coverage;
-                        // scratch[idx + 2] = scratch[idx + 2] * (1 - coverage) + rgb[2] * coverage;
-
-                        // New way
                         scratch[idx] += rgb[0] * coverage;
                         scratch[idx + 1] += rgb[1] * coverage;
                         scratch[idx + 2] += rgb[2] * coverage;
@@ -554,11 +540,6 @@ export class HeatmapRenderer {
             const idx = y * 3;
             const cov = Math.min(1, this.coverageScratchpad![y]);
             const remainder = 1 - cov; // Any uncovered space in the pixel stays white
-            // Old way
-            // const r = Math.round(this.columnScratchpad[idx]);
-            // const g = Math.round(this.columnScratchpad[idx + 1]);
-            // const b = Math.round(this.columnScratchpad[idx + 2]);
-            // New way
             const r = Math.min(255, Math.round(this.columnScratchpad![idx] + 255 * remainder));
             const g = Math.min(255, Math.round(this.columnScratchpad![idx + 1] + 255 * remainder));
             const b = Math.min(255, Math.round(this.columnScratchpad![idx + 2] + 255 * remainder));
