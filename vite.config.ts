@@ -1,20 +1,10 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 
 export default defineConfig({
-  plugins: [solidPlugin()],
-  base: './',
-  server: {
-    headers: {
-      // Required for SharedArrayBuffer (The "High Performance" requirement)
-      "Cross-Origin-Opener-Policy": "same-origin",
-      "Cross-Origin-Embedder-Policy": "require-corp",
+    test: {
+        environment: 'node',
+        include: ['src/**/*.test.ts'],
     },
-  },
-  worker: {
-    format: 'es', // Ensures workers are bundled as ES Modules
-  },
-  build: {
-    target: 'esnext', // Optimization for 2026 browsers
-  }
 });
